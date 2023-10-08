@@ -1,0 +1,136 @@
+body {
+    background-color: black;
+    color: white;
+  }
+  
+  main > * {
+    padding: 1em;
+  }
+  
+  .costly {
+    background-color: red;
+  }
+  
+  
+  
+  dynamic-component {
+    display: block;
+  }
+  
+  /***** PAGE ****/
+  
+  :root {
+    --nav-height: 50px;
+    --aside-width: 200px;
+    --product-background-color: #363636;
+    --product-background-color--hover: #484848;
+  }
+  
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  .page {
+    display: grid;
+    grid-template-columns: [left] var(--aside-width) [center] calc(
+        100vw - var(--aside-width)
+      );
+    grid-template-rows: [top] max(var(--nav-height), max-content) [content] 100vh;
+  }
+  
+  nav {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: row;
+    color: white;
+    & a {
+      padding: 1rem;
+      text-decoration: none;
+      display: block;
+      background-color: #282828;
+      margin-left: 1em;
+      color: white;
+      border-radius: 0.2rem;
+      box-shadow: 2px 4px 4px 3px #43434354;
+      
+      &.active {
+        color:rgb(130, 130, 254)
+      }
+    }
+    & a:hover {
+      background-color: #363636;
+    }
+    & a:visited {
+      color: white;
+    }
+  }
+  
+  aside {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  main {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  
+  .product-list {
+    list-style-type: none;
+    max-height: calc(100vh - var(--nav-height));
+    overflow-y: scroll;
+    border-left: solid blue;
+    border-right: solid blue;
+    padding: 0;
+  }
+  
+  
+  .loading {
+    pointer-events: none;
+    & h3,& p {
+    animation: rolling 5s linear infinite;
+    background: linear-gradient(90deg, #858484, #6a6a6a, #858484);
+    border-radius: 0.2em;
+    filter: blur(0.5px);
+  }
+  & h3 {
+    min-height: 1rem;
+    margin-top: 1px;
+  }
+  
+  & p {
+    min-height: 2rem;
+  }
+  }
+  
+  @keyframes rolling {
+    0% {
+      background-position: 50em 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+  
+  
+  
+  .product {
+    & > h3 {
+      margin-top: 1px;
+    }
+    background-color: var(--product-background-color);
+    font-size: 0.9rem;
+    padding: 0.2rem;
+    margin: 0.2rem;
+  
+    /* Override link styles */
+    display: block;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    &:hover {
+      background-color: var(--product-background-color--hover);
+    }
+  }
+  

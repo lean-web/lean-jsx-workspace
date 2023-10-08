@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`context context decorates elements with actions correctly 1`] = `
+[
+  {
+    "children": [],
+    "ctx": ContextImpl {
+      "_data": {},
+      "_handlers": [
+        [
+          "onclick",
+          "function () {
+                        console.log("1");
+                    }",
+        ],
+      ],
+      "_id": "element-0",
+      "globalContext": undefined,
+    },
+    "props": {
+      "dataset": {
+        "element-0": "true",
+      },
+      "onclick": "",
+    },
+    "type": "button",
+  },
+  {
+    "children": [],
+    "ctx": ContextImpl {
+      "_data": {},
+      "_handlers": [
+        [
+          "onclick",
+          "function () {
+                        console.log("1");
+                    }",
+        ],
+      ],
+      "_id": "element-1",
+      "globalContext": undefined,
+    },
+    "props": {
+      "dataset": {
+        "element-1": "true",
+      },
+      "onclick": "",
+    },
+    "type": "button",
+  },
+]
+`;

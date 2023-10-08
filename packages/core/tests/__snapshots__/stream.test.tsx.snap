@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stream JSX Lazy elements display placeholders 1`] = `
+"<body>
+  <p data-placeholder="placeholder-element-0">Loading...</p><template id="placeholder-element-0">
+    <div data-placeholder="placeholder-element-6"></div>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-0");
+  </script>
+  <template id="placeholder-element-6">
+    <div class="costly">I'm costly content</div>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-6");
+  </script>
+</body>"
+`;
+
+exports[`Stream JSX Streams JSX as HTML 1`] = `
+"<body>
+  <div>
+    <h1>Hello world</h1>
+    <div data-placeholder="placeholder-element-3"></div>
+    <p>After async</p>
+  </div><template id="placeholder-element-3">
+    <div class="costly">I'm costly content<button element-8="true">Click me</button>
+      <script>
+        (function() {
+
+          document.querySelector('[element-8]').addEventListener('click', () => console.log("Inside costly"))
+        }).call({})
+      </script>
+    </div>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-3");
+  </script>
+</body>"
+`;
+
+exports[`Stream JSX Streams JSX as HTML into another stream 1`] = `
+"<body>
+  <div>
+    <h1>Hello world</h1>
+    <div data-placeholder="placeholder-element-3"></div>
+    <p>After async</p>
+  </div><template id="placeholder-element-3">
+    <p>I'm async</p>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-3");
+  </script>
+</body>"
+`;
+
+exports[`Stream JSX Streams JSX as HTML with nested async functions 1`] = `
+"<body>
+  <div>
+    <h1>Hello world</h1>
+    <p data-placeholder="placeholder-element-2">Loading...</p>
+    <p>After async</p>
+  </div><template id="placeholder-element-2">
+    <div data-placeholder="placeholder-element-9"></div>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-2");
+  </script>
+  <template id="placeholder-element-9">
+    <div class="costly">I'm costly content<div data-placeholder="placeholder-element-14"></div>
+    </div>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-9");
+  </script>
+  <template id="placeholder-element-14"><button element-13="true">Click me</button>
+    <script>
+      (function() {
+
+        document.querySelector('[element-13]').addEventListener('click', () => console.log("Inside costly"))
+      }).call({})
+    </script>
+  </template>
+  <script>
+    sxl.fillPlaceHolder("placeholder-element-14");
+  </script>
+</body>"
+`;
