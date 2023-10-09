@@ -38,7 +38,7 @@ describe("DOM test", () => {
         expect(doms[0]).toBe(`${staticFirstPart}${placeholder}${end}`);
 
         expect(doms[1]).toBe(
-            `${staticFirstPart}<p>Hello world</p></div><template id="placeholder-element-3"><p>Hello world</p></template><script> sxl.fillPlaceHolder("placeholder-element-3"); </script> `
+            `${staticFirstPart}<p>Hello world</p></div><template id="placeholder-element-3"><p>Hello world</p></template><script> sxl.fillPlaceHolder("placeholder-element-3"); </script>`
         );
     });
 
@@ -76,7 +76,7 @@ describe("DOM test", () => {
             `<div>${staticFirstPart}<div data-placeholder="placeholder-element-2">${loadingContent}</div></div>`
         );
         expect(doms[1]).toBe(
-            `<div>${staticFirstPart}${lazyContent}</div><template id="placeholder-element-2"><div data-placeholder="placeholder-element-8"></div></template><script> sxl.fillPlaceHolder("placeholder-element-2"); </script> <template id="placeholder-element-8"><p>Hello world</p></template><script> sxl.fillPlaceHolder("placeholder-element-8"); </script> `
+            `<div>${staticFirstPart}${lazyContent}</div><template id="placeholder-element-2"><div data-placeholder="placeholder-element-8"></div></template><script> sxl.fillPlaceHolder("placeholder-element-2"); </script> <template id="placeholder-element-8"><p>Hello world</p></template><script> sxl.fillPlaceHolder("placeholder-element-8"); </script>`
         );
         expect(doms[2]).toBe(
             `<div>${staticFirstPart}<div data-placeholder="placeholder-element-8">${loadingContent}</div></div><template id="placeholder-element-2"><div data-placeholder="placeholder-element-8"></div></template><script> sxl.fillPlaceHolder("placeholder-element-2"); </script>`

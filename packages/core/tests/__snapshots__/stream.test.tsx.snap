@@ -24,7 +24,7 @@ exports[`Stream JSX Streams JSX as HTML 1`] = `
     <div data-placeholder="placeholder-element-3"></div>
     <p>After async</p>
   </div><template id="placeholder-element-3">
-    <div class="costly">I'm costly content<button element-8="true">Click me</button>
+    <div class="costly">I'm costly content<button data-element-8="true">Click me</button>
       <script>
         (function() {
 
@@ -73,7 +73,7 @@ exports[`Stream JSX Streams JSX as HTML with nested async functions 1`] = `
   <script>
     sxl.fillPlaceHolder("placeholder-element-9");
   </script>
-  <template id="placeholder-element-14"><button element-13="true">Click me</button>
+  <template id="placeholder-element-14"><button data-element-13="true">Click me</button>
     <script>
       (function() {
 

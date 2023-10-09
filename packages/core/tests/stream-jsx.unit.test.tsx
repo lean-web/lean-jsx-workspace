@@ -3,30 +3,10 @@ import { ContextFactory } from "@/jsx/html/context";
 import sinon from "sinon";
 import { Readable } from "stream";
 
-import { withSxlStaticElement } from "./test-utils";
+import { readableToString, withSxlStaticElement } from "./test-utils";
 import { getHTMLStreamFromJSX } from "@/jsx/html/stream";
 import { AsynJSXStream } from "@/jsx/html/stream/async-jsx-stream";
 import { SynJSXStream } from "@/jsx/html/stream/syn-jsx-stream";
-
-/**
- * Reads all the text in a readable stream and returns it as a string,
- * via a Promise.
- * @param {stream.Readable} readable
- */
-function readableToString(readable: Readable): Promise<string> {
-    return new Promise((resolve, reject) => {
-        let data = "";
-        readable.on("data", function (chunk) {
-            data += chunk;
-        });
-        readable.on("end", function () {
-            resolve(data);
-        });
-        readable.on("error", function (err) {
-            reject(err);
-        });
-    });
-}
 
 describe("JSXToHTMLStream - Unit Tests", () => {
     test("Base case", async () => {
@@ -46,7 +26,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
         const handleStaticElementSpy = sinon.spy(stream, "handleStaticElement");
 
         const result = await readableToString(stream);
-        expect(result).toEqual("<p ></p>");
+        expect(result).toEqual("<p></p>");
 
         expect(stubbedPush.callCount).toBe(3);
         expect(handleStaticElementSpy.callCount).toBe(1);
@@ -69,7 +49,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
         const handleStaticElementSpy = sinon.spy(stream, "handleStaticElement");
 
         const result = await readableToString(stream);
-        expect(result).toEqual("<body><p ></p></body>");
+        expect(result).toEqual("<body><p></p></body>");
 
         expect(stubbedPush.callCount).toBe(5);
         expect(handleStaticElementSpy.callCount).toBe(1);
@@ -155,7 +135,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
         const result = await readableToString(stream);
         const clean = result.replace(/[ \n]{1,}/g, " ");
         expect(clean).toEqual(
-            `<button element-0="true"></button><script> (function(){ document.querySelector('[element-0]').addEventListener('click', function (ev) { console.log(ev); }) }).call({}) </script> `
+            `<button data-element-0="true"></button><script> (function(){ document.querySelector('[element-0]').addEventListener('click', function (ev) { console.log(ev); }) }).call({}) </script>`
         );
 
         expect(stubbedPush.callCount).toBe(4);
@@ -224,7 +204,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
         const result = await readableToString(stream);
         const clean = result.replace(/[ \n]{1,}/g, " ");
         expect(clean).toEqual(
-            `<div class="container"><span >hello</span>friend</div>`
+            `<div class="container"><span>hello</span>friend</div>`
         );
 
         expect(stubbedPush.callCount).toBe(7);
@@ -299,9 +279,9 @@ describe("JSXToHTMLStream - Unit Tests", () => {
         const handleStaticElementSpy = sinon.spy(stream, "handleStaticElement");
 
         const result = await readableToString(stream);
-        const clean = result.replace(/[ \n]{1,}/g, " ");
-        expect(clean).toEqual(
-            `<div data-placeholder="placeholder-element-1"></div><template id="placeholder-element-1"><p ><span >hello</span></p></template><script> sxl.fillPlaceHolder("placeholder-element-1"); </script> `
+
+        expect(result).toEqual(
+            `<div data-placeholder="placeholder-element-1"></div><template id="placeholder-element-1"><p><span>hello</span></p></template><script> sxl.fillPlaceHolder("placeholder-element-1"); </script>`
         );
 
         expect(stubbedPush.callCount).toBe(11);
@@ -342,7 +322,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
 
         const result = await readableToString(stream);
         const clean = result.replace(/[ \n]{1,}/g, " ");
-        expect(clean).toEqual(`<p ><span >hello</span></p>`);
+        expect(clean).toEqual(`<p><span>hello</span></p>`);
 
         expect(stubbedPush.callCount).toBe(6);
     }, 2000);
