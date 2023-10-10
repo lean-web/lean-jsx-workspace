@@ -33,5 +33,5 @@
     }
     
   },
-  "include": ["web", "server", "sxl.d.ts", "vite.config.js", "src"]
+  "include": ["web", "server", "sxl.d.ts", "vite.config.js", "src", "build.js"]
 }

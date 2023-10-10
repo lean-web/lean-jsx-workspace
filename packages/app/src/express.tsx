@@ -23,7 +23,7 @@ import { DynamicProductList } from "./products/product-list";
 
 // console.log(html);
 
-const ASSETS_PATH = "./dist";
+const ASSETS_PATH = path.resolve(__dirname, "./");
 
 declare module "@sxl/core/src/types/context" {
     interface SXLGlobalContext extends RequestQueryParams {}
@@ -113,7 +113,6 @@ function createServer() {
     app.get("/product/:productId", async (req, res) => {
         const productId = req.params["productId"];
         const params = toGlobalState(req.query);
-        console.log({ productId }); //
 
         // const indexHtml: string = await import("./web/index.html");
 
@@ -128,8 +127,7 @@ function createServer() {
 
     app.use("/", async (req, res) => {
         const params = toGlobalState(req.query);
-        // const url = req.originalUrl;
-        console.log("Start loading");
+
         console.log("html", path.resolve(ASSETS_PATH, "./index.html"));
         // const indexHtml: string = await import("./web/index.html");
 

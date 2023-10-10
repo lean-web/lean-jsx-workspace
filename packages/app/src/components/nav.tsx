@@ -2,8 +2,6 @@ import { RequestQueryParams } from "../context";
 import { toQueryString } from "@sxl/core/dist/server/components";
 
 export function Nav({ globalContext }: { globalContext?: RequestQueryParams }) {
-    console.log({ globalContext });
-
     const isLoadingStateEnabled = globalContext?.withLoadingState ?? false;
     const dynamicProductListLinkEnabled =
         globalContext?.dynamicProductList ?? false;

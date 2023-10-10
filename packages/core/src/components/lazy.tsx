@@ -8,7 +8,6 @@ export function toQueryString(
     if (!globalContext) {
         return url;
     }
-    console.log({ globalContext });
     return (
         url +
         "?" +
