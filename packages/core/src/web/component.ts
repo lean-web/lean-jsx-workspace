@@ -42,12 +42,16 @@ export class DynamicComponent
             .then((data) => {
                 const div = document.createElement("div");
                 div.innerHTML = data;
-                const renderedContent = div.querySelector("template");
+                const renderedContent = div.querySelector("template") ?? div;
 
-                const container = this?.querySelector("#data-container");
+                const container = this?.firstElementChild;
                 // TODO: Handle failures
                 if (container) {
                     container.innerHTML = renderedContent?.innerHTML ?? "";
+                } else {
+                    console.debug(
+                        "Could not find an element inside DynamicComponent"
+                    );
                 }
             })
             .finally(() => {

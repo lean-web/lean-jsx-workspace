@@ -14,6 +14,7 @@ export default function injectScript(packageName: string): Plugin {
                     const injectedFileName = Object.keys(context.bundle).find(
                         (key) => /injected_/.test(key)
                     );
+
                     //   context.
                     if (injectedFileName) {
                         return {
@@ -21,7 +22,7 @@ export default function injectScript(packageName: string): Plugin {
                             tags: [
                                 {
                                     tag: "script",
-                                    attrs: { src: injectedFileName },
+                                    attrs: { src: `/${injectedFileName}` },
                                     injectTo: "head",
                                 },
                             ],
@@ -38,6 +39,10 @@ export default function injectScript(packageName: string): Plugin {
                 "utf-8"
             );
 
+            // const loaded = await this.resolve(
+            //     "@sxl/core/dist/web/sxl.global.js"
+            // );
+
             // Create an injected script asset
             // TODO: Get assets dir from config
             const injectedFileName = options.sanitizeFileName(
@@ -47,6 +52,7 @@ export default function injectScript(packageName: string): Plugin {
             this.emitFile({
                 type: "prebuilt-chunk",
                 fileName: injectedFileName,
+
                 code: scriptContent,
             });
         },

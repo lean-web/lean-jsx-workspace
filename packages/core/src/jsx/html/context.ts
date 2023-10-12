@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { SXLGlobalContext } from "@/context";
+
+import { SXLGlobalContext } from "@sxl/core/src/types/context";
 import { isPromise } from "./jsx-utils";
 import { UIDGenerator } from "./uuid";
 
@@ -17,16 +18,6 @@ type ClientHandler<
 > = ExtendedEventHandlers<Ctx>[T];
 
 export type ContextType = "eager" | "lazy";
-
-interface ComponentContext<Ctx> {
-    getId(): string;
-
-    toSource(): string;
-
-    decorate(vnode: SXL.Element): SXL.Element;
-}
-export type Context<Ctx extends Record<string, unknown>> = Ctx &
-    ComponentContext<Ctx>;
 
 type KeyHandlerTyple<Ctx, T extends keyof ExtendedEventHandlers<Ctx>> = [
     T,
@@ -51,7 +42,7 @@ export class ContextFactory {
         this.opts = opts;
         this.globalContext = globalContext;
     }
-    newContext<K extends Record<string, undefined>>() {
+    newContext<K extends Record<string, undefined>>(): ContextImpl<K> {
         const ctx = new ContextImpl<K>(this.idGen());
         const handler1: ProxyHandler<ContextImpl<K>> = {
             get(target, prop, receiver) {
@@ -73,10 +64,7 @@ export class ContextFactory {
             },
         };
 
-        return new Proxy<ContextImpl<K>>(
-            ctx,
-            handler1
-        ) as unknown as Context<K>;
+        return new Proxy<ContextImpl<K>>(ctx, handler1);
     }
 
     buildPlaceholderId(): string {
@@ -88,9 +76,7 @@ export class ContextFactory {
     }
 }
 
-export class ContextImpl<Ctx extends Record<string, unknown>>
-    implements ComponentContext<Ctx>
-{
+export class ContextImpl<Ctx extends Record<string, unknown>> {
     private static idGen = UIDGenerator.new();
     private globalContext?: SXLGlobalContext;
     _id: string;
@@ -150,9 +136,7 @@ export class ContextImpl<Ctx extends Record<string, unknown>>
                 }
                 // node.props.dataset = dataset;
                 // console.log({ asyncCtxBefore: node.ctx });
-                node.ctx = this as unknown as Context<
-                    Record<string, undefined>
-                >;
+                node.ctx = this as SXL.Context<Record<string, unknown>>;
                 // console.log({ asyncCtxAfter: node.ctx });
                 return node;
             });
@@ -164,7 +148,7 @@ export class ContextImpl<Ctx extends Record<string, unknown>>
         const dataset = vnode.props.dataset ?? {};
         dataset[this._id] = "true";
         vnode.props.dataset = dataset;
-        vnode.ctx = this as unknown as Context<Record<string, undefined>>;
+        vnode.ctx = this as SXL.Context<Record<string, unknown>>;
 
         return vnode;
     }

@@ -7,6 +7,15 @@ export class AsyncChunk {
     private id: string;
     processed = false;
 
+    static isAsyncChunk(obj: unknown): obj is AsyncChunk {
+        return (
+            !!obj &&
+            typeof obj === "object" &&
+            "placeholder" in obj &&
+            "element" in obj
+        );
+    }
+
     constructor(
         id: string,
         asyncElement: Promise<SXL.StaticElement>,

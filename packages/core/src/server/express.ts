@@ -2,40 +2,48 @@ import type { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import { pipeline } from "stream";
 import { DynamicController } from "../components/lazy";
-import { SXLGlobalContext } from "../context";
-import { ContextFactory } from "../jsx/html/context";
-import { getHTMLStreamFromJSX } from "@/jsx/html/stream";
+import { JSXStream } from "@/jsx/html/stream/jsx-stack";
+import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
 
-export function render(
+export async function render(
     element: SXL.Element,
     template: string,
     globalContext?: SXLGlobalContext,
     jsDisabled?: boolean
 ) {
     const [before, after] = template.split("<!--EAGER_CONTENT-->");
-    return getHTMLStreamFromJSX(
-        element,
-        new ContextFactory({ prefix: "scmp" }, globalContext),
-        [before, after],
-        {
-            jsDisabled: jsDisabled ?? false,
-        }
-    );
+
+    const stream = new JSXStream(element, globalContext ?? {}, {
+        pre: [before],
+        post: [after],
+        sync: jsDisabled,
+    });
+
+    await stream.init();
+    return stream;
 }
 
-export function renderComponent(
+export async function renderComponent(
     element: SXL.Element,
-    globalContext?: SXLGlobalContext,
-    jsDisabled?: boolean
+    globalContext?: SXLGlobalContext
 ) {
-    return getHTMLStreamFromJSX(
-        element,
-        new ContextFactory({ prefix: "acmp" }, globalContext),
-        ["", ""],
-        {
-            jsDisabled: jsDisabled ?? false,
-        }
-    );
+    // return getHTMLStreamFromJSX(
+    //     element,
+    //     new ContextFactory({ prefix: "acmp" }, globalContext),
+    //     ["", ""],
+    //     {
+    //         jsDisabled: jsDisabled ?? false,
+    //     }
+    // );
+    const stream = new JSXStream(element, globalContext ?? {}, {
+        pre: [],
+        post: [],
+        sync: true,
+    });
+
+    await stream.init();
+    return stream;
 }
 
 function getComponent(req: Request): string | undefined {
@@ -90,22 +98,27 @@ export function sxlMiddleware(options: SXLMiddlewareOptions) {
 
     return (req: Request, res: Response, next: NextFunction) => {
         bodyParserMid(req, res, (err) => {
+            if (err) {
+                return next(err);
+            }
             try {
                 const globalContext = toGlobalState(req.query);
                 const maybeComponentName = getComponent(req);
 
                 if (maybeComponentName && controllerMap[maybeComponentName]) {
-                    const componentHtml = renderComponent(
+                    void renderComponent(
                         controllerMap[maybeComponentName].Api({
                             globalContext,
                         }),
                         globalContext
-                    );
-                    return pipeline(
-                        componentHtml,
-                        res.status(200).set({ "Content-Type": "text/html" }),
-                        () => next()
-                    );
+                    )
+                        .then((htmlStream) => {
+                            htmlStream.pipe(res);
+                        })
+                        .catch((err) => next(err));
+
+                    // const html = await readableToString(componentHtml);
+                    // res.status(200).set({ "Content-Type": "text/html" }).send(html);
                 } else {
                     next();
                 }

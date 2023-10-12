@@ -1,33 +1,7 @@
 import { JSDOM } from "jsdom";
-import { readableToString } from "./test-utils";
-import { ContextFactory } from "@/jsx/html/context";
-import { AsynJSXStream } from "@/jsx/html/stream/async-jsx-stream";
-
-export class TestJSXStream extends AsynJSXStream {
-    reachedStaticEnd = false;
-    flushed = false;
-    content: string = "";
-    flushes: string[] = [];
-
-    override scheduleAsyncRender() {
-        queueMicrotask(() => {
-            const handled = super.handleNextAvailableAsync();
-            if (handled) {
-                this.flushes.push(this.content);
-            }
-        });
-    }
-
-    override push(chunk: any, encoding?: BufferEncoding | undefined): boolean {
-        this.content += chunk;
-        return super.push(chunk, encoding);
-    }
-
-    override flushAsyncQueue() {
-        this.flushes.push(this.content);
-        super.flushAsyncQueue();
-    }
-}
+import { fillPlaceHolder as fp } from "@/web/wiring";
+import { JSXStack } from "@/jsx/html/stream/jsx-stack";
+import { SXLGlobalContext } from "@/types/context";
 
 export function stringToDom(data: string): [JSDOM, string[]] {
     const domChanges: string[] = [];
@@ -39,51 +13,16 @@ export function stringToDom(data: string): [JSDOM, string[]] {
             runScripts: "dangerously",
             beforeParse(window) {
                 const document = window.document;
+                globalThis.document = document;
                 window.sxl = {
                     fillPlaceHolder(placeHolderId: string) {
-                        const template = document.getElementById(
-                            placeHolderId
-                        ) as HTMLTemplateElement;
-                        const container = document.querySelector(
-                            `[data-placeholder="${placeHolderId}"]`
-                        );
-
-                        if (!template || !container) {
-                            return;
-                        }
-                        const clone = document.importNode(
-                            template.content,
-                            true
-                        );
-                        const maybeNestedTemplate =
-                            clone.querySelector("[data-placeholder]");
-                        if (maybeNestedTemplate) {
-                            while (container.firstChild) {
-                                maybeNestedTemplate.appendChild(
-                                    container.firstChild
-                                );
-                            }
-                        }
-
-                        container.innerHTML = "";
-                        container.removeAttribute(`[data-${placeHolderId}]`);
-                        if (container.parentElement) {
-                            // if we can, replace the placeholder with the actual element
-                            container.parentElement.replaceChild(
-                                clone,
-                                container
-                            );
-                        } else {
-                            container.appendChild(clone);
-                        }
+                        fp.call({ document }, placeHolderId);
                         domChanges.push(
                             window.document.body.innerHTML.replace(
                                 /[ \n]{1,}/g,
                                 " "
                             )
                         );
-                        // clean-up the template
-                        // template.remove();
                     },
                 };
             },
@@ -102,16 +41,46 @@ export function stringToDom(data: string): [JSDOM, string[]] {
     return [dom, domChanges];
 }
 
+async function consumeStack(
+    stack: JSXStack<SXLGlobalContext>,
+    cb: (curValue: string) => void
+): Promise<string> {
+    let first = await stack.pop();
+    let all = "";
+
+    stack.on("ASYNC_START", () => {
+        cb(all);
+    });
+
+    stack.on("ASYNC_END", () => {
+        cb(all);
+    });
+
+    stack.on("END", () => {
+        queueMicrotask(() => {
+            cb(all);
+        });
+    });
+
+    while (first) {
+        all += first;
+        first = await stack.pop();
+    }
+    return all;
+}
+
 export async function jsxToDOMTest(jsx: SXL.Element) {
-    const stream = new TestJSXStream(jsx, new ContextFactory(), [""], [""]);
+    const stream = new JSXStack({ username: "" });
+    await stream.push(jsx);
 
-    const content = await readableToString(stream);
-    stream.flushes.push(content);
-
-    const doms = stream.flushes
-        .map((flush) => stringToDom(flush))
-        // TODO: Fix the order of these changes
-        .flatMap(([dom, domChanges]) => [domContent(dom), ...domChanges]);
+    const doms: string[] = [];
+    await consumeStack(stream, (data) => {
+        const [dom, domChanges] = stringToDom(data);
+        doms.push(domContent(dom));
+        domChanges.forEach((d) => {
+            doms.push(d);
+        });
+    });
 
     return doms;
 }

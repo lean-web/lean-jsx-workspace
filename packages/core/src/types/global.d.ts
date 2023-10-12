@@ -18,8 +18,7 @@ declare global {
 
             decorate(vnode: Element): Element;
         }
-        export type Context<Ctx extends Record<string, unknown>> = Ctx &
-            ComponentContext<Ctx>;
+        export type Context<Ctx extends Record<string, unknown>> = Ctx;
 
         export type Children = Array<string | StaticElement>;
 
@@ -30,16 +29,39 @@ declare global {
             globalContext?: SXLGlobalContext;
         }
 
+        export interface ComponentProps<G extends SXLGlobalContext>
+            extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+            children?: Children;
+            dataset?: DOMStringMap;
+            globalContext?: G;
+        }
+
         export type NodeFactory = (args: Props) => StaticElement | AsyncElement;
 
-        export interface ClassElement {
+        export interface ClassComponent {
             render(): StaticElement;
             renderLazy(): StaticElement | AsyncElement;
         }
 
         export interface ClassFactory {
-            new (props: Props | undefined): ClassElement;
+            new (props: Props | undefined): ClassComponent;
         }
+
+        export type ClassElement = {
+            type: ClassFactory;
+            props: Props;
+            children: Children;
+            isDynamic?: boolean;
+            ctx?: Context<Record<string, unknown>>;
+        };
+
+        export type FunctionElement = {
+            type: NodeFactory;
+            props: Props;
+            children: Children;
+            isDynamic?: boolean;
+            ctx?: Context<Record<string, unknown>>;
+        };
 
         export type StaticElement = {
             type: string | NodeFactory | ClassFactory;
@@ -56,7 +78,7 @@ declare global {
 
     namespace JSX {
         type Element = SXL.Element;
-        interface ElementClass extends SXL.ClassElement {}
+        interface ElementClass extends SXL.ClassComponent {}
         interface IntrinsicElements {
             a: HTMLAttributes<HTMLAnchorElement>;
             aside: HTMLAttributes<HTMLDivElement>;

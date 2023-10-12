@@ -104,7 +104,10 @@ function normalizeProKey(key: string) {
     return jsxToHtmlMap[key] ?? jsxToHtmlAriaMap[key] ?? key;
 }
 
-function normalizePropValue(value: string | number) {
+function normalizePropValue(value: string | number | null) {
+    if (value === null) {
+        return "";
+    }
     return typeof value === "number" ? value : `"${value}"`;
 }
 
@@ -136,7 +139,7 @@ function flatten(
         if (!value) {
             return [];
         }
-        if (/children/.test(key)) {
+        if (/(children|globalContext)/.test(key)) {
             return [];
         }
         if (/^on.+/.test(key)) {
@@ -151,6 +154,9 @@ function flatten(
                 /^data-/.test(dk) ? dk : `data-${dk}`,
                 dv,
             ]) as [[string, string | number]];
+        }
+        if (/^data-/.test(key)) {
+            return value ? [[key, value]] : [[key, null]];
         }
 
         if (typeof value !== "string" && typeof value !== "number") {
@@ -169,7 +175,8 @@ export class JSXToHTMLUtils {
         if (!isStaticNode(jsx)) {
             throw new Error(
                 "Cannot handle JSX nodes with function or class types." +
-                    "Please construct the node before calling this method"
+                    "Please construct the node before calling this method. Component: " +
+                    JSON.stringify(jsx)
             );
         }
 

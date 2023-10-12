@@ -64,7 +64,7 @@ async function renderWithTemplate(
         // const html = import("./web/index.html");
 
         const template = fs.readFileSync(templatePath, "utf-8");
-        const appHtml = render(element, template, ctx, ctx?.jsDisabled);
+        const appHtml = await render(element, template, ctx, ctx?.jsDisabled);
 
         await pipeline(
             appHtml,
