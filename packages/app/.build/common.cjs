@@ -1,5 +1,5 @@
 const { resolve, basename, extname } = require("path");
-const { injectScript } = require("@sxl/core/dist/plugins/vite");
+const { injectScript } = require("lean-jsx/dist/plugins/vite");
 const packageConfig = require("../package.json");
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
         };
         const esbuildOptions = config.server?.esbuildOptions ?? {};
 
-        /**  @type {import("@sxl/core/src/types/build").default} */
+        /**  @type {import("lean-jsx/src/types/build").default} */
         const conf = {
             web: {
                 root,
@@ -33,7 +33,7 @@ module.exports = {
                     assetsDir: "assets",
                     emptyOutDir,
                 },
-                plugins: [injectScript("@sxl/core"), ...plugins],
+                plugins: [injectScript("lean-jsx"), ...plugins],
             },
             server: {
                 main: resolve(

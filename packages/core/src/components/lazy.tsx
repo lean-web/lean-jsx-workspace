@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
 
 export function toQueryString(
     url: string,

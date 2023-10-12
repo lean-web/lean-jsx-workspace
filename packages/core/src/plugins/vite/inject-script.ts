@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { Plugin } from "vite";
 
 /**
- * A Vite plugin to inject @sxl/core/dist/web/sxl.global.js into the
+ * A Vite plugin to inject lean-jsx/dist/web/sxl.global.js into the
  * main index.html document.
  *
  * This injection is needed because, by default, Vite bundles all JavaScript
@@ -47,12 +47,12 @@ export default function injectScript(packageName: string): Plugin {
         generateBundle(options) {
             // Read the script content from the package
             const scriptContent = fs.readFileSync(
-                require.resolve("@sxl/core/dist/web/sxl.global.js"),
+                require.resolve("lean-jsx/dist/web/sxl.global.js"),
                 "utf-8"
             );
 
             // const loaded = await this.resolve(
-            //     "@sxl/core/dist/web/sxl.global.js"
+            //     "lean-jsx/dist/web/sxl.global.js"
             // );
 
             // Create an injected script asset

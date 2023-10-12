@@ -1,2 +1,2 @@
-/// <reference types="@sxl/core/src/types/global" />
+/// <reference types="lean-jsx/src/types/global" />
 /// <reference lib="dom" />

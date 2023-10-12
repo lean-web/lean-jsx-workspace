@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import path from "path";
 import express from "express";
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
-import { renderWithTemplate, sxlMiddleware } from "@sxl/core/dist/server";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
+import { renderWithTemplate, sxlMiddleware } from "lean-jsx/dist/server";
 import bodyParser from "body-parser";
 import { RequestQueryParams } from "./context";
 import { Home } from "./home/home";
@@ -11,7 +11,7 @@ import { DynamicProductList } from "./products/product-list";
 
 const ASSETS_PATH = path.resolve(__dirname, "./");
 
-declare module "@sxl/core/src/types/context" {
+declare module "lean-jsx/src/types/context" {
     interface SXLGlobalContext extends RequestQueryParams {}
 }
 

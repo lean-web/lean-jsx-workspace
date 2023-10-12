@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import { DynamicController } from "../components/lazy";
 import { JSXStream } from "@/jsx/html/stream/jsx-stack";
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
 import { pipeline } from "stream/promises";
 import { GetDynamicComponent } from "@/components/lazy";
 import fs from "fs";

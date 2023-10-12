@@ -1,5 +1,5 @@
 import { RequestQueryParams } from "../context";
-import { toQueryString } from "@sxl/core/dist/server/components";
+import { toQueryString } from "lean-jsx/dist/server/components";
 
 export function Nav({ globalContext }: { globalContext?: RequestQueryParams }) {
     const isLoadingStateEnabled = globalContext?.withLoadingState ?? false;

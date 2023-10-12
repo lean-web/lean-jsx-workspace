@@ -1,5 +1,5 @@
-import { Lazy } from "@sxl/core/dist/server/components";
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { Lazy } from "lean-jsx/dist/server/components";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
 
 import {
     DynamicProductList,

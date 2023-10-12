@@ -1,4 +1,4 @@
-/**  @type {import("@sxl/core/src/types/build").default} */
+/**  @type {import("lean-jsx/src/types/build").default} */
 export default {
     web: {},
     server: {

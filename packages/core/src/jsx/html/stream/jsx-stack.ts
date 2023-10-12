@@ -13,7 +13,7 @@ import {
     SXLElementWithContext,
     isAsyncElementWithContext,
 } from "@/jsx/context/context-manager";
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
 import {
     decorateContext,
     wirePlaceholder,

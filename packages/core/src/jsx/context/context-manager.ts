@@ -1,7 +1,7 @@
 import { isPromise, unwrapFragments } from "../html/jsx-utils";
 import { UIDGenerator } from "../html/uuid";
 import { TrackablePromise } from "../html/stream/stream-utils/trackable-promise";
-import { SXLGlobalContext } from "@sxl/core/src/types/context";
+import { SXLGlobalContext } from "lean-jsx/src/types/context";
 
 interface SyncJSXWrapper {
     id: ContextID;

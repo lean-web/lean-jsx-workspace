@@ -3,7 +3,7 @@ import { fetchProducts, Product } from "../services/products";
 import {
     GetDynamicComponent,
     toQueryString,
-} from "@sxl/core/dist/server/components";
+} from "lean-jsx/dist/server/components";
 
 export function ProductListDetails({
     product,
