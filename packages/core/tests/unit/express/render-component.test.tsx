@@ -1,6 +1,7 @@
+import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
 import { renderComponent } from "@/server/express";
 import { describe, expect, test } from "@jest/globals";
-import { readableToString } from "../../test-utils";
+
 describe("render-component-test", () => {
     test("description", async () => {
         const stream = await renderComponent(<p>Hello</p>, {});

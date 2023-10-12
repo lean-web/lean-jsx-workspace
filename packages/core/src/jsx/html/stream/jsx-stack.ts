@@ -1,5 +1,4 @@
 import { Readable, ReadableOptions } from "stream";
-import { ContextFactory, ContextImpl } from "../context";
 import { JSXToHTMLUtils } from "../jsx-to-html";
 import {
     isTextNode,
@@ -7,19 +6,14 @@ import {
     isFunctionNode,
     isPromise,
     isStaticNode,
-    isFragmentNode,
     unwrapFragments,
 } from "../jsx-utils";
-import { AsyncChunk } from "./stream-utils/async-chunk";
-import { mergeProps } from "./stream-utils/merge-props";
 import {
     ContextManager,
     SXLElementWithContext,
     isAsyncElementWithContext,
 } from "@/jsx/context/context-manager";
 import { SXLGlobalContext } from "@sxl/core/src/types/context";
-import { TrackablePromise } from "./stream-utils/trackable-promise";
-import { subscribe } from "diagnostics_channel";
 import {
     decorateContext,
     wirePlaceholder,
@@ -57,10 +51,6 @@ type JSXStackEventMap = {
 
 function isEventKey(str: string): str is JSXStackEvents {
     return !!MARKERS[str];
-}
-
-function isRequeued(str: string) {
-    return str.includes(REQUEUED);
 }
 
 export class JSXStack<G extends SXLGlobalContext> {

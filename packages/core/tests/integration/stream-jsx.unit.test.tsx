@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { describe, expect, test } from "@jest/globals";
-import { readableToString, withSxlStaticElement } from "../test-utils";
+import { withSxlStaticElement } from "../test-utils";
 import { JSXStream } from "@/jsx/html/stream/jsx-stack";
+import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
 
 describe("JSXToHTMLStream - Unit Tests", () => {
     test("Base case", async () => {
