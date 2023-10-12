@@ -9,12 +9,6 @@ export default defineConfig({
         "jsx/jsx-runtime": "./src/jsx/core/jsx-runtime.ts",
         "web/sxl": "./src/web/index.ts",
     },
-    // outExtension({ options, format, pkgType }) {
-    //     console.log({ options, format, pkgType });
-    //     return {
-    //         js: `.${format}.js`,
-    //     };
-    // },
     target: "es2018",
     format: ["esm", "cjs", "iife"],
     splitting: false,

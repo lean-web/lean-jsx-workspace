@@ -27,6 +27,7 @@ export class TrackablePromise<T, E> {
     private _promise: Promise<T>;
     private _value: T | undefined;
     private _id?: string;
+    private _err?: E;
 
     constructor(p: Promise<T>, id?: string) {
         void p
@@ -36,6 +37,7 @@ export class TrackablePromise<T, E> {
             })
             .catch((err) => {
                 this._status = "rejected";
+                this._err = err as E;
             });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -74,12 +76,15 @@ export class TrackablePromise<T, E> {
         }
     }
 
-    get id() {
-        return this._id;
+    get error() {
+        if (this.status === "rejected") {
+            return this._err;
+        }
+        return undefined;
     }
 
-    get error(): E {
-        return undefined as E;
+    get id() {
+        return this._id;
     }
 
     get then() {

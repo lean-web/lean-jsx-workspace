@@ -29,8 +29,8 @@ export function decorateContext(element: SXLElementWithContext) {
         )
         .join(";\n");
     const fns = Object.entries(element.context)
-        // .map((entry) => entry[1])
         .filter(
+            // eslint-disable-next-line @typescript-eslint/ban-types
             (entry): entry is [string, Function] =>
                 typeof entry[1] === "function"
         )

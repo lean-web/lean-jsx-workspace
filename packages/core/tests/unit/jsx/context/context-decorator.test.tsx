@@ -5,6 +5,7 @@ import {
     isAsyncElementWithContext,
 } from "@/jsx/context/context-manager";
 import { describe, expect, test } from "@jest/globals";
+
 describe("context-decorator.test", () => {
     test("decorate static component with no handlers", () => {
         const contextManager = new ContextManager({ username: "" });
@@ -80,7 +81,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
             this.name = "Pedro";
             return (
                 <button
-                    onclick={(ev) => console.log(`Hi, my name is ${this.name}`)}
+                    onclick={() => console.log(`Hi, my name is ${this.name}`)}
                 >
                     {this.name}, click here
                 </button>
@@ -96,7 +97,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
         expect(decoration).toMatchInlineSnapshot(`
 "<script>
       (function(){
-        document.querySelector('[data-action="element-0"]').addEventListener('click', (ev) => console.log(\`Hi, my name is \${this.name}\`))
+        document.querySelector('[data-action="element-0"]').addEventListener('click', () => console.log(\`Hi, my name is \${this.name}\`))
       }).call({"name":"Pedro"})
     </script>"
 `);
@@ -109,7 +110,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
             this.name = "Pedro";
             return (
                 <button
-                    onclick={(ev) => console.log(`Hi, my name is ${this.name}`)}
+                    onclick={() => console.log(`Hi, my name is ${this.name}`)}
                 >
                     {this.name}, click here
                 </button>

@@ -4,5 +4,11 @@
           "url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
           "fileMatch": ["package.json", "tsup.config.json"]
         }
-      ]
+      ],
+      "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "packages/core/docs": true
+      }
 }

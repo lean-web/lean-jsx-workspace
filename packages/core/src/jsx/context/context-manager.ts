@@ -1,8 +1,6 @@
-import { isPromise, isTextNode, unwrapFragments } from "../html/jsx-utils";
+import { isPromise, unwrapFragments } from "../html/jsx-utils";
 import { UIDGenerator } from "../html/uuid";
 import { TrackablePromise } from "../html/stream/stream-utils/trackable-promise";
-import { Fragment as jsxFragment } from "../core/jsx-runtime";
-import { Fragment as jsxDEVFragment } from "../core/jsx-dev-runtime";
 import { SXLGlobalContext } from "@sxl/core/src/types/context";
 
 interface SyncJSXWrapper {
@@ -38,15 +36,6 @@ type HandlerPropAndValue = [string, string];
 
 export class LocalContext implements SXL.Context<Record<string, unknown>> {
     [x: string]: unknown;
-    getId(): string {
-        throw new Error("Method not implemented.");
-    }
-    toSource(): string {
-        throw new Error("Method not implemented.");
-    }
-    decorate(vnode: SXL.Element): SXL.Element {
-        throw new Error("Method not implemented.");
-    }
 }
 
 interface ContextManagerOptions {
@@ -195,10 +184,4 @@ export class ContextManager<G extends SXLGlobalContext> {
             children: placehoder ? unwrapFragments(placehoder) : [],
         };
     }
-}
-
-function isFragmentNode(
-    element: SXL.StaticElement
-): element is SXL.FunctionElement {
-    return element.type === jsxFragment || element.type === jsxDEVFragment;
 }

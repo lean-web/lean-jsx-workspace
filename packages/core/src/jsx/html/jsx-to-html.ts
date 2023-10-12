@@ -129,9 +129,7 @@ function isCSSDeclaration(
     return /style/.test(propKey);
 }
 
-function flatten(
-    props: SXL.Props | Record<string, unknown>
-): [string, string | number][] {
+function flatten(props: SXL.Props): [string, string | number][] {
     if (Array.isArray(props)) {
         return props;
     }
@@ -150,7 +148,7 @@ function flatten(
         }
         if (key === "dataset") {
             // TODO
-            return Object.entries(value as {}).map(([dk, dv]) => [
+            return Object.entries(value as DOMStringMap).map(([dk, dv]) => [
                 /^data-/.test(dk) ? dk : `data-${dk}`,
                 dv,
             ]) as [[string, string | number]];

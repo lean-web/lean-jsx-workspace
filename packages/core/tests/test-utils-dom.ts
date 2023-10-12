@@ -87,7 +87,7 @@ export async function jsxToDOMTest(jsx: SXL.Element) {
 
 export interface Deferred<T> {
     resolve: (arg: T | PromiseLike<T>) => void;
-    reject: (reason?: any) => void;
+    reject: (reason?: unknown) => void;
     promise: Promise<T>;
 }
 

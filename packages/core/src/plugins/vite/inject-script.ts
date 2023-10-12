@@ -1,8 +1,20 @@
 import fs from "node:fs";
-import { resolve } from "node:path";
 import { Plugin } from "vite";
-import * as g from "@sxl/core/dist/web/sxl.global.js";
 
+/**
+ * A Vite plugin to inject @sxl/core/dist/web/sxl.global.js into the
+ * main index.html document.
+ *
+ * This injection is needed because, by default, Vite bundles all JavaScript
+ * into ES modules, which by default are defered.
+ *
+ * sxl.global.js needs to be executed before the HTML is streamd back from
+ * the server, as it provides simple functions to replace placeholder for slow-loading
+ * content.
+ *
+ * @param packageName - the name to use for the injected module.
+ * @returns a Vite plugin
+ */
 export default function injectScript(packageName: string): Plugin {
     return {
         name: "vite-plugin-inject-script",

@@ -42,8 +42,6 @@ const MARKERS = {
     END: "END",
 };
 
-const REQUEUED = "REQUEUED";
-
 type JSXStackEvents = keyof typeof MARKERS;
 type JSXStackEventMap = {
     [K in JSXStackEvents]?: Array<() => void>;

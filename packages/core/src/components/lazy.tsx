@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-
 import { SXLGlobalContext } from "@sxl/core/src/types/context";
 
 export function toQueryString(
@@ -19,13 +18,15 @@ export function toQueryString(
     );
 }
 
+/**
+ * The properties passed to {@link Lazy}.
+ */
 interface ComponentArgs extends SXL.Props {
+    /**
+     * A JSX component to render as a placeholder while the <Lazy>
+     * main children is resolved.
+     */
     loading: SXL.Element;
-}
-
-abstract class ClassComponent {
-    abstract render(): SXL.StaticElement;
-    abstract renderLazy(): SXL.AsyncElement;
 }
 
 function isPromise(
@@ -34,11 +35,14 @@ function isPromise(
     return !!jsx && "then" in jsx;
 }
 
-export class Lazy extends ClassComponent {
+/**
+ * A utility JSX component that allows async JSX components to display
+ * loading state as a placeholder.
+ */
+export class Lazy implements SXL.ClassComponent {
     props: ComponentArgs;
 
     constructor(props: ComponentArgs) {
-        super();
         this.props = props;
     }
 
@@ -60,7 +64,7 @@ export class Lazy extends ClassComponent {
     }
 }
 
-interface PendingResolve<T> {
+interface PendingResolve {
     isPending: true;
     isResolved: false;
     isError: false;
@@ -74,14 +78,44 @@ interface ResolvedPromise<T> {
     value: T;
 }
 
-type TrackedPromise<T> = PendingResolve<T> | ResolvedPromise<T>;
+type TrackedPromise<T> = PendingResolve | ResolvedPromise<T>;
 
+/**
+ * Provides methods to render a dynamically-loaded component
+ * (one that doesn't block the main document loading).
+ *
+ * This object is meant to be created by the factory method {@link GetDynamicComponent},
+ * as it relies on a very specific implementation.
+ */
 export interface DynamicController {
     contentId: string;
+    /**
+     * Render the component's loading state.
+     * @param props - the component's properties {@link SXL.Props}
+     * @returns - a JSX component
+     */
     Render: (props: SXL.Props) => SXL.Element;
+    /**
+     * Renders the component's loaded state.
+     * @param props - the component's properties {@link SXL.Props}
+     * @returns - a JSX component
+     */
     Api: (props: SXL.Props) => SXL.AsyncElement;
 }
 
+/**
+ * Creates a {@link DynamicController} wrapper for a dynamic component.
+ *
+ * Dynamic Components don't block the DOM, and they are similar to traditional React components.
+ * The difference is that no state is tracked in the client, and the whole component is replaced
+ * when the promise returned by a fetcher is fulfilled.
+ *
+ * @param contentId - A unique name for the component (e.g. "product-list")
+ * @param fetcher - A function that returns a Promise.
+ * @param render - A function that will receive the promise returned by the fetcher,
+ *  and can return different JSX content depending on the promise state.
+ * @returns A {@link DynamicController}
+ */
 export function GetDynamicComponent<T>(
     contentId: string,
     fetcher: () => Promise<T>,

@@ -1,41 +1,73 @@
 import type { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import { pipeline } from "stream";
 import { DynamicController } from "../components/lazy";
 import { JSXStream } from "@/jsx/html/stream/jsx-stack";
 import { SXLGlobalContext } from "@sxl/core/src/types/context";
-import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
+import { pipeline } from "stream/promises";
+import { GetDynamicComponent } from "@/components/lazy";
+import fs from "fs";
 
-export async function render(
-    element: SXL.Element,
-    template: string,
-    globalContext?: SXLGlobalContext,
-    jsDisabled?: boolean
-) {
-    const [before, after] = template.split("<!--EAGER_CONTENT-->");
+/**
+ * Options to render JSX in a stringified HTML document.
+ */
+export interface RenderOptions {
+    /**
+     * The string content of the HTML document to render.
+     */
+    template: string;
+    /**
+     * The string placeholder that will be used to split the document.
+     *
+     * By default, <!--EAGER_CONTENT--> will be used.
+     *
+     */
+    contentPlaceholder?: string;
+    /**
+     * Whether the streamed HTML should run in "sync" mode (waiting in sequential
+     * order for each JSX component to be rendered)
+     */
+    sync?: boolean;
+    /**
+     * The global context to pass to each JSX component.
+     */
+    globalContext?: SXLGlobalContext;
+}
+
+/**
+ * Render a JSX element into an HTML template.
+ *
+ * @param element - The JSX component to render
+ * @param options - The {@link RenderOptions}
+ * @returns A {@link Readable} stream
+ */
+export async function render(element: SXL.Element, options: RenderOptions) {
+    const { template, sync, globalContext, contentPlaceholder } = options;
+    const [before, after] = template.split(
+        contentPlaceholder ?? "<!--EAGER_CONTENT-->"
+    );
 
     const stream = new JSXStream(element, globalContext ?? {}, {
         pre: [before],
         post: [after],
-        sync: jsDisabled,
+        sync,
     });
 
     await stream.init();
     return stream;
 }
 
+/**
+ * Render a JSX component synchronously. This is meant to be used in API endpoints
+ * that return the contents for a subset of components in the application.
+ *
+ * @param element - The JSX component to render
+ * @param globalContext - And optional global context object
+ * @returns A {@link Readable} stream
+ */
 export async function renderComponent(
     element: SXL.Element,
     globalContext?: SXLGlobalContext
 ) {
-    // return getHTMLStreamFromJSX(
-    //     element,
-    //     new ContextFactory({ prefix: "acmp" }, globalContext),
-    //     ["", ""],
-    //     {
-    //         jsDisabled: jsDisabled ?? false,
-    //     }
-    // );
     const stream = new JSXStream(element, globalContext ?? {}, {
         pre: [],
         post: [],
@@ -50,10 +82,6 @@ function getComponent(req: Request): string | undefined {
     const [_, component] =
         req.originalUrl.match(/\/components\/([\w-]+)/) ?? [];
     return component;
-}
-
-export interface SXLMiddlewareOptions {
-    components: DynamicController[];
 }
 
 function isStringRepresentingBoolean(str: string) {
@@ -82,9 +110,23 @@ function toGlobalState(args: Record<string, unknown>): SXLGlobalContext {
 }
 
 /**
- * Middleware for Express
- * @param options
- * @returns
+ * Options for the SXL middleware options
+ */
+export interface SXLMiddlewareOptions {
+    /**
+     * A list of {@link DynamicController} objects.
+     *
+     * These can be created with {@link GetDynamicComponent}
+     */
+    components: DynamicController[];
+}
+
+/**
+ * Middleware for Express for easily suppoting the rendering of dynamic components
+ * in Express.
+ *
+ * @param options - The {@link SXLMiddlewareOptions}
+ * @returns An Express middleware.
  */
 export function sxlMiddleware(options: SXLMiddlewareOptions) {
     const bodyParserMid = bodyParser.urlencoded({ extended: true });
@@ -127,9 +169,53 @@ export function sxlMiddleware(options: SXLMiddlewareOptions) {
             }
         });
     };
+}
 
-    // app.use(bodyParser.urlencoded({ extended: true }));
-    // return async (r: Request, res: Response, next: NextFunction) => {
+/**
+ * Options for rendering JSX inside an HTML template
+ */
+export interface RenderWithTemplateOptions
+    extends Omit<RenderOptions, "template"> {
+    /**
+     * The file path to the HTML template. This path will be used as-is to try to fetch
+     * the HTML contents.
+     */
+    templatePath: string;
+}
 
-    // };
+/**
+ * Stream a JSX component -inside an HTML template- to an Express HTTP Response.
+ *
+ * @param res - The Express Response object
+ * @param element - The JSX component to render
+ * @param options - The {@link RenderWithTemplateOptions}
+ * @param next - An Express Middleware "next" function, if available.
+ */
+export async function renderWithTemplate(
+    res: Response,
+    element: SXL.Element,
+    options: RenderWithTemplateOptions,
+    next?: NextFunction
+) {
+    try {
+        const template = fs.readFileSync(options.templatePath, "utf-8");
+        const appHtml = await render(element, { ...options, template });
+
+        await pipeline(
+            appHtml,
+            res.status(200).set({ "Content-Type": "text/html" })
+        );
+    } catch (e) {
+        if (
+            e instanceof Error &&
+            "code" in e &&
+            e.code === "ERR_STREAM_PREMATURE_CLOSE"
+        ) {
+            console.error("Stream closed prematurely");
+        } else {
+            if (next) {
+                next(e);
+            }
+        }
+    }
 }
