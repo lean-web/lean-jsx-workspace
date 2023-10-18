@@ -22,6 +22,8 @@ module.exports = {
         "@typescript-eslint/ban-types": "warn",
         "@typescript-eslint/no-namespace": "warn",
         "@typescript-eslint/no-explicit-any": "error",
-        "@typescript-eslint/no-misused-promises": "warn"
+        "@typescript-eslint/no-misused-promises": "warn",
+        "@typescript-eslint/no-unsafe-return": "warn",
+        "@typescript-eslint/no-unsafe-call": "warn"
     }
 };

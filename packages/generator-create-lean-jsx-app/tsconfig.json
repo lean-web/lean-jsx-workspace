@@ -12,8 +12,8 @@
     "jsx": "react-jsx", // support custom JSX
     "jsxImportSource": "lean-jsx/dist/jsx",
     "paths": {
-      "@/": ["./src/"],
-      "@/*": ["./src/*"]
+      "@/": ["./generators/app/templates/src/"],
+      "@/*": ["./generators/app/templates/src/*"]
     }
   },
   "include": ["generators/**/*.ts", "generators/**/*.tsx"],
