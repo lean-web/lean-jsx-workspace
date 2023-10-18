@@ -27,8 +27,10 @@
     "jsx": "react-jsx", // support JSX
     "jsxImportSource": "@/jsx/core",
     "paths": {
-      "@/": ["./src/"],
-      "@/*": ["./src/*"]
+        "@tests/": ["./tests/"],
+        "@tests/*": ["./tests/*"],
+        "@/": ["./src/"],
+        "@/*": ["./src/*"]
     }
   },
   "include": ["src", "tests"]

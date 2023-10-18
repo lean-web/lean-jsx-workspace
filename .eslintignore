@@ -4,3 +4,4 @@ dist
 globaal.d.ts
 types/*.d.ts
 watch.cjs
+build.cjs

@@ -2,7 +2,8 @@
     "name": "sxl",
     "workspaces": [
         "packages/core",
-        "packages/app"
+        "packages/app",
+        "packages/generator-create-lean-jsx-app"
     ],
     "devDependencies": {
         "@types/node": "^20.8.3",

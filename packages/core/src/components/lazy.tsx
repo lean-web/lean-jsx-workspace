@@ -125,14 +125,13 @@ export function GetDynamicComponent<T>(
         Render: (props: SXL.Props) => (
             <dynamic-component
                 data-id={toQueryString(contentId, props.globalContext)}
-                className="dyn"
             >
                 {render({
                     isPending: true,
                     isError: false,
                     isResolved: false,
                     value: null,
-                    ...props,
+                    ...props
                 })}
             </dynamic-component>
         ),
@@ -143,10 +142,10 @@ export function GetDynamicComponent<T>(
                 isError: false,
                 isResolved: true,
                 value: data,
-                ...props,
+                ...props
             });
         },
-        contentId,
+        contentId
     };
 }
 

@@ -1,10 +1,17 @@
 import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
-import { renderComponent } from "@/server/express";
+import { buildApp } from "@/server/express";
 import { describe, expect, test } from "@jest/globals";
+import { setupTests } from "@tests/test-container";
 
 describe("render-component-test", () => {
     test("description", async () => {
-        const stream = await renderComponent(<p>Hello</p>, {});
+        const app = buildApp({
+            templates: { index: { head: "", tail: "" } },
+            logging: {
+                defaultLogLevel: "info"
+            }
+        });
+        const stream = await app.renderComponent(<p>Hello</p>, {});
 
         const html = await readableToString(stream);
 

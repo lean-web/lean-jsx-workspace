@@ -2,13 +2,15 @@ import { Lazy } from "@/components";
 import { decorateContext } from "@/jsx/context/context-decorator";
 import {
     ContextManager,
-    isAsyncElementWithContext,
+    isAsyncElementWithContext
 } from "@/jsx/context/context-manager";
 import { describe, expect, test } from "@jest/globals";
+import { setupTests } from "@tests/test-container";
 
 describe("context-decorator.test", () => {
+    const { contextManager: ctxManagerFactory } = setupTests();
     test("decorate static component with no handlers", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromStaticElement(
             (<div data-attr="yes">Hello</div>) as SXL.StaticElement
@@ -20,11 +22,11 @@ describe("context-decorator.test", () => {
     });
 
     test("decorate static component with one handler", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromStaticElement(
             (
-                <button onclick={(ev) => console.log(ev)} data-attr="yes">
+                <button onclick={ev => console.log(ev)} data-attr="yes">
                     Click
                 </button>
             ) as SXL.StaticElement
@@ -35,19 +37,19 @@ describe("context-decorator.test", () => {
         expect(decoration).toMatchInlineSnapshot(`
 "<script>
       (function(){
-        document.querySelector('[data-action="element-0"]').addEventListener('click', (ev) => console.log(ev))
+        document.querySelector('[data-action="element-0"]').addEventListener('click', ev => console.log(ev))
       }).call({})
     </script>"
 `);
     });
 
     test("decorate static component with two handlers", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromStaticElement(
             (
                 <button
-                    onclick={(ev) => console.log(ev)}
+                    onclick={ev => console.log(ev)}
                     onload={() => alert("Go!")}
                     data-attr="yes"
                 >
@@ -67,7 +69,7 @@ describe("context-decorator.test", () => {
         expect(decoration).toMatchInlineSnapshot(`
 "<script>
       (function(){
-        document.querySelector('[data-action="element-0"]').addEventListener('click', (ev) => console.log(ev));
+        document.querySelector('[data-action="element-0"]').addEventListener('click', ev => console.log(ev));
 document.querySelector('[data-action="element-0"]').addEventListener('load', () => alert("Go!"))
       }).call({})
     </script>"
@@ -75,7 +77,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
     });
 
     test("decorate function component with one handler and local context", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         function Button(this: { name: string }) {
             this.name = "Pedro";
@@ -104,7 +106,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
     });
 
     test("decorate async function component ", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         async function Button(this: { name: string }) {
             this.name = "Pedro";
@@ -127,7 +129,7 @@ document.querySelector('[data-action="element-0"]').addEventListener('load', () 
     });
 
     test("decorate async function component ", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromClass(
             (

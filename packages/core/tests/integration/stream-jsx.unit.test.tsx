@@ -1,49 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { describe, expect, test } from "@jest/globals";
 import { withSxlStaticElement } from "../test-utils";
-import { JSXStream } from "@/jsx/html/stream/jsx-stack";
 import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
+import { setupTests } from "@tests/test-container";
 
 describe("JSXToHTMLStream - Unit Tests", () => {
+    const { jsxStream } = setupTests();
     test("Base case", async () => {
-        const stream = new JSXStream(<p>Hello</p>, { username: "" });
+        const stream = jsxStream(<p>Hello</p>, { username: "" });
         await stream.init();
 
         const result = await readableToString(stream);
         expect(result).toEqual("<p>Hello</p>");
     }, 2000);
 
-    test("With head and tails", async () => {
-        const stream = new JSXStream(
-            {
-                type: "p",
-                props: {
-                    dataset: {},
-                },
-                children: [],
-            },
-            { username: "" },
-            { pre: ["<body>"], post: ["</body>"] }
-            // [("<body>", "</body>")]
-        );
-        await stream.init();
-
-        const result = await readableToString(stream);
-        expect(result).toEqual("<body><p></p></body>");
-    }, 2000);
-
     test("With className", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: "p",
                 props: {
                     className: "hello",
-                    dataset: {},
+                    dataset: {}
                 },
-                children: [],
+                children: []
             },
             { username: "" }
-            // ["", ""]
         );
         await stream.init();
 
@@ -52,18 +33,19 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("With style", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: "p",
                 props: {
                     style: {
                         backgroundColor: "red",
-                        padding: "10px",
+                        padding: "10px"
                     },
-                    dataset: {},
+                    dataset: {}
                 },
-                children: [],
+                children: []
             },
+
             { username: "" }
             // ["", ""]
         );
@@ -76,17 +58,18 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("With on click", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: "button",
                 props: {
-                    onclick: function (ev) {
+                    onclick: function(ev) {
                         console.log(ev);
                     },
-                    dataset: {},
+                    dataset: {}
                 },
-                children: [],
+                children: []
             },
+
             { username: "" }
             // ["", ""]
         );
@@ -101,21 +84,22 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("Function", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: ({ className }) => ({
                     type: "button",
                     props: {
-                        className,
+                        className
                     },
-                    children: ["Click"],
+                    children: ["Click"]
                 }),
                 props: {
                     className: "btn",
-                    dataset: {},
+                    dataset: {}
                 },
-                children: [],
+                children: []
             },
+
             { username: "" }
         );
         await stream.init();
@@ -126,22 +110,23 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("With children", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: "div",
                 props: {
                     className: "container",
-                    dataset: {},
+                    dataset: {}
                 },
                 children: [
                     {
                         type: "span",
                         props: {},
-                        children: ["hello"],
+                        children: ["hello"]
                     },
-                    "friend",
-                ],
+                    "friend"
+                ]
             },
+
             { username: "" }
             // ["", ""]
         );
@@ -155,22 +140,23 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("Fragment", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 type: "fragment",
                 props: {
                     className: "container",
-                    dataset: {},
+                    dataset: {}
                 },
                 children: [
                     {
                         type: "span",
                         props: {},
-                        children: ["hello"],
+                        children: ["hello"]
                     },
-                    "friend",
-                ],
+                    "friend"
+                ]
             },
+
             { username: "" }
             // ["", ""]
         );
@@ -182,7 +168,7 @@ describe("JSXToHTMLStream - Unit Tests", () => {
     }, 2000);
 
     test("With async component", async () => {
-        const stream = new JSXStream(
+        const stream = jsxStream(
             {
                 // eslint-disable-next-line @typescript-eslint/require-await
                 type: async ({ children }) =>
@@ -190,21 +176,22 @@ describe("JSXToHTMLStream - Unit Tests", () => {
                         withChild:
                             children && typeof children[0] === "object"
                                 ? children[0]
-                                : undefined,
+                                : undefined
                     }),
                 props: {
                     className: "container",
-                    dataset: {},
+                    dataset: {}
                 },
                 children: [
                     {
                         type: "span",
                         props: {},
-                        children: ["hello"],
+                        children: ["hello"]
                     },
-                    "friend",
-                ],
+                    "friend"
+                ]
             },
+
             { username: "" }
             // ["", ""]
         );

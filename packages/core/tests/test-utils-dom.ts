@@ -2,6 +2,7 @@ import { JSDOM } from "jsdom";
 import { fillPlaceHolder as fp } from "@/web/wiring";
 import { JSXStack } from "@/jsx/html/stream/jsx-stack";
 import { SXLGlobalContext } from "@/types/context";
+import { setupTests } from "@tests/test-container";
 
 export function stringToDom(data: string): [JSDOM, string[]] {
     const domChanges: string[] = [];
@@ -23,18 +24,18 @@ export function stringToDom(data: string): [JSDOM, string[]] {
                                 " "
                             )
                         );
-                    },
+                    }
                 };
-            },
+            }
         }
     );
 
-    dom.virtualConsole.on("error", (err) => {
+    dom.virtualConsole.on("error", err => {
         console.error(err);
         throw err;
     });
 
-    dom.virtualConsole.on("log", function (this: unknown, err) {
+    dom.virtualConsole.on("log", function(this: unknown, err) {
         console.log(err);
     });
 
@@ -70,14 +71,15 @@ async function consumeStack(
 }
 
 export async function jsxToDOMTest(jsx: SXL.Element) {
-    const stream = new JSXStack({ username: "" });
+    const TestContainer = setupTests();
+    const stream = TestContainer.jsxStack<{}>({});
     await stream.push(jsx);
 
     const doms: string[] = [];
-    await consumeStack(stream, (data) => {
+    await consumeStack(stream, data => {
         const [dom, domChanges] = stringToDom(data);
         doms.push(domContent(dom));
-        domChanges.forEach((d) => {
+        domChanges.forEach(d => {
             doms.push(d);
         });
     });
@@ -93,7 +95,7 @@ export interface Deferred<T> {
 
 export function defer<T>(): Deferred<T> {
     const deferred = {} as Deferred<T>;
-    const promise = new Promise<T>(function (resolve, reject) {
+    const promise = new Promise<T>(function(resolve, reject) {
         deferred.resolve = resolve;
         deferred.reject = reject;
     });

@@ -2,18 +2,20 @@ import { Lazy } from "@/components";
 import {
     ContextManager,
     LocalContext,
-    isAsyncElementWithContext,
+    isAsyncElementWithContext
 } from "@/jsx/context/context-manager";
 import { SXLGlobalContext } from "@/types/context";
 import { describe, expect, test } from "@jest/globals";
+import { setupTests } from "@tests/test-container";
 
 interface MyGlobalContext extends SXLGlobalContext {
     username: string;
 }
 
 describe("context-manager.test", () => {
+    const { contextManager: ctxManagerFactory } = setupTests();
     test("fromStaticElement", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromStaticElement(
             (<div data-attr="yes">Hello</div>) as SXL.StaticElement
@@ -27,8 +29,8 @@ describe("context-manager.test", () => {
     });
 
     test("fromStaticElement - with handler", () => {
-        const onClick = (ev) => console.log(ev);
-        const contextManager = new ContextManager({ username: "" });
+        const onClick = ev => console.log(ev);
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromStaticElement(
             (<button onclick={onClick}>Click</button>) as SXL.StaticElement
@@ -38,27 +40,27 @@ describe("context-manager.test", () => {
         expect(isAsyncElementWithContext(result)).toBeFalsy();
         expect(result.element).toStrictEqual({
             actions: {
-                onclick: onClick,
+                onclick: onClick
             },
             children: ["Click"],
             props: {
                 dataset: {
-                    "data-action": "element-0",
+                    "data-action": "element-0"
                 },
-                onclick: "",
+                onclick: ""
             },
-            type: "button",
+            type: "button"
         });
         expect(result.id).toBeTruthy();
         expect(result.handlers.length).toBe(1);
         expect(result.handlers[0]).toStrictEqual([
             "onclick",
-            onClick.toString(),
+            onClick.toString()
         ]);
     });
 
     test("fromFunction", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
         function Hello() {
             return <p>Hello</p>;
         }
@@ -74,7 +76,7 @@ describe("context-manager.test", () => {
     });
 
     test("fromFunction: With handler", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
         const onClick = () => console.log("Hello");
         function Hello() {
             return <p onclick={onClick}>Hello</p>;
@@ -87,27 +89,27 @@ describe("context-manager.test", () => {
         expect(isAsyncElementWithContext(result)).toBeFalsy();
         expect(result.element).toStrictEqual({
             actions: {
-                onclick: onClick,
+                onclick: onClick
             },
             children: ["Hello"],
             props: {
                 dataset: {
-                    "data-action": "element-0",
+                    "data-action": "element-0"
                 },
-                onclick: "",
+                onclick: ""
             },
-            type: "p",
+            type: "p"
         });
         expect(result.id).toBeTruthy();
         expect(result.handlers.length).toBe(1);
         expect(result.handlers[0]).toStrictEqual([
             "onclick",
-            onClick.toString(),
+            onClick.toString()
         ]);
     });
 
     test("fromFunction: With handler in function component", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
         const onClick = () => console.log("Hello");
         function Hello({ onclick }: SXL.ComponentProps<MyGlobalContext>) {
             return <button onclick={onclick}>Click</button>;
@@ -120,30 +122,30 @@ describe("context-manager.test", () => {
         expect(isAsyncElementWithContext(result)).toBeFalsy();
         expect(result.element).toStrictEqual({
             actions: {
-                onclick: onClick,
+                onclick: onClick
             },
             children: ["Click"],
             props: {
                 dataset: {
-                    "data-action": "element-0",
+                    "data-action": "element-0"
                 },
-                onclick: "",
+                onclick: ""
             },
-            type: "button",
+            type: "button"
         });
         expect(result.id).toBeTruthy();
         expect(result.handlers.length).toBe(1);
         expect(result.handlers[0]).toStrictEqual([
             "onclick",
-            onClick.toString(),
+            onClick.toString()
         ]);
     });
 
     test("fromFunction: async", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
         const onClick = () => console.log("Hello");
         async function Hello(): SXL.AsyncElement {
-            return new Promise((resolve) =>
+            return new Promise(resolve =>
                 resolve(<p onclick={onClick}>Hello</p>)
             );
         }
@@ -155,10 +157,10 @@ describe("context-manager.test", () => {
             type: "div",
             props: {
                 dataset: {
-                    "data-placeholder": "element-0",
-                },
+                    "data-placeholder": "element-0"
+                }
             },
-            children: [],
+            children: []
         });
         expect(isAsyncElementWithContext(result)).toBeTruthy();
         expect(result.element).toHaveProperty("then");
@@ -167,7 +169,7 @@ describe("context-manager.test", () => {
     });
 
     test("fromClass", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         const result = contextManager.fromClass(
             (
@@ -181,10 +183,10 @@ describe("context-manager.test", () => {
             type: "div",
             props: {
                 dataset: {
-                    "data-placeholder": "element-0",
-                },
+                    "data-placeholder": "element-0"
+                }
             },
-            children: ["Loading"],
+            children: ["Loading"]
         });
         expect(isAsyncElementWithContext(result)).toBeTruthy();
         expect(result.element).toHaveProperty("then");
@@ -193,7 +195,7 @@ describe("context-manager.test", () => {
     });
 
     test("fromFunction: With local context", () => {
-        const contextManager = new ContextManager({ username: "" });
+        const contextManager = ctxManagerFactory({ username: "" });
 
         interface HelloContext {
             firstName: string;
@@ -213,21 +215,21 @@ describe("context-manager.test", () => {
         expect(result.element).toEqual({
             children: ["Hello"],
             actions: {
-                onclick: expect.any(Function),
+                onclick: expect.any(Function)
             },
             props: {
                 dataset: {
-                    "data-action": "element-0",
+                    "data-action": "element-0"
                 },
-                onclick: "",
+                onclick: ""
             },
-            type: "p",
+            type: "p"
         });
         expect(result.id).toBeTruthy();
         expect(result.handlers.length).toBe(1);
         expect(result.handlers[0]).toStrictEqual([
             "onclick",
-            "() => console.log(this.firstName)",
+            "() => console.log(this.firstName)"
         ]);
         const expectedContext = new LocalContext();
         expectedContext.firstName = "Pedro";
@@ -235,7 +237,7 @@ describe("context-manager.test", () => {
     });
 
     test("fromFunction: With global context", () => {
-        const contextManager = new ContextManager({ username: "pedro" });
+        const contextManager = ctxManagerFactory({ username: "pedro" });
 
         function Hello({ globalContext }: SXL.ComponentProps<MyGlobalContext>) {
             return <div>Name: {globalContext?.username}</div>;
@@ -250,9 +252,9 @@ describe("context-manager.test", () => {
             children: ["Name: ", "pedro"],
             actions: {},
             props: {
-                dataset: {},
+                dataset: {}
             },
-            type: "div",
+            type: "div"
         });
         expect(result.id).toBeTruthy();
         expect(result.handlers.length).toBe(0);

@@ -1,4 +1,5 @@
 import { Layout } from "../layout";
+import logo from "@/web/public/logo.svg";
 
 interface HomeParams {
     productIndexStart?: number;
@@ -11,6 +12,8 @@ export function Home({ productIndexStart }: HomeParams) {
             <h1>Welcome</h1>
 
             <p>Choose a product to start</p>
+
+            {logo}
         </Layout>
     );
 }

@@ -2,6 +2,7 @@ import { isPromise, unwrapFragments } from "../html/jsx-utils";
 import { UIDGenerator } from "../html/uuid";
 import { TrackablePromise } from "../html/stream/stream-utils/trackable-promise";
 import { SXLGlobalContext } from "lean-jsx/src/types/context";
+import { IErrorHandler } from "../degradation/error-handler";
 
 interface SyncJSXWrapper {
     id: ContextID;
@@ -38,18 +39,24 @@ export class LocalContext implements SXL.Context<Record<string, unknown>> {
     [x: string]: unknown;
 }
 
-interface ContextManagerOptions {
+export interface ContextManagerOptions {
     sync: boolean;
 }
 
 export class ContextManager<G extends SXLGlobalContext> {
     private options: ContextManagerOptions;
+    private errorHandler: IErrorHandler;
     private uiden = UIDGenerator.new();
     private globalContext: G;
 
-    constructor(globalContext: G, options?: ContextManagerOptions) {
+    constructor(
+        globalContext: G,
+        errorHandler: IErrorHandler,
+        options?: ContextManagerOptions
+    ) {
         this.globalContext = globalContext;
         this.options = options ?? { sync: false };
+        this.errorHandler = errorHandler;
     }
 
     newContext(): SXL.Context<Record<string, unknown>> {
@@ -67,11 +74,19 @@ export class ContextManager<G extends SXLGlobalContext> {
         const id = this.uiden();
         const localCtx = this.newContext();
 
-        const newElement = element.type.bind(localCtx)({
-            ...element.props,
-            children: element.children,
-            globalContext: this.globalContext,
-        });
+        const newElement = this.errorHandler.withErrorHandling(
+            () =>
+                element.type.bind(localCtx)({
+                    ...element.props,
+                    children: element.children,
+                    globalContext: this.globalContext
+                }),
+            {
+                extraInfo: {
+                    componentFunction: element.type.name
+                }
+            }
+        );
 
         return this.processElement(id, localCtx, newElement);
     }
@@ -84,15 +99,29 @@ export class ContextManager<G extends SXLGlobalContext> {
         const classNode = new element.type({
             ...element.props,
             children: element.children,
-            globalContext: this.globalContext,
+            globalContext: this.globalContext
         });
 
-        return this.processElement(
-            id,
-            localCtx,
-            classNode.renderLazy(),
-            classNode.render()
+        const { errorHandler } = this;
+
+        const placeholder = errorHandler.withErrorHandling(
+            () => classNode.render(),
+            {
+                extraInfo: {
+                    classComponent: classNode.render.bind(null).name
+                }
+            }
         );
+        const lazyElement = errorHandler.withErrorHandling(
+            () => classNode.renderLazy(),
+            {
+                extraInfo: {
+                    classComponent: classNode.renderLazy.bind(null).name
+                }
+            }
+        );
+
+        return this.processElement(id, localCtx, lazyElement, placeholder);
     }
 
     private processElement(
@@ -105,7 +134,7 @@ export class ContextManager<G extends SXLGlobalContext> {
             return {
                 id,
                 element: new TrackablePromise(
-                    element.then((element) => {
+                    element.then(element => {
                         // if operating in sync mode,
                         // we don't need to wrap the async element
                         // in a template
@@ -118,16 +147,16 @@ export class ContextManager<G extends SXLGlobalContext> {
                         return {
                             type: "template",
                             props: {
-                                id,
+                                id
                             },
-                            children: unwrapFragments(element),
+                            children: unwrapFragments(element)
                         };
                     }),
                     id
                 ),
                 placeholder: this.processPlaceholder(id, placeholder),
                 handlers: [],
-                context,
+                context
             };
         }
 
@@ -136,7 +165,7 @@ export class ContextManager<G extends SXLGlobalContext> {
             element,
             placeholder: undefined,
             handlers: this.processHandlers(id, element),
-            context,
+            context
         };
     }
 
@@ -178,10 +207,14 @@ export class ContextManager<G extends SXLGlobalContext> {
             type: "div",
             props: {
                 dataset: {
-                    ["data-placeholder"]: id,
-                },
+                    ["data-placeholder"]: id
+                }
             },
-            children: placehoder ? unwrapFragments(placehoder) : [],
+            children: placehoder ? unwrapFragments(placehoder) : []
         };
     }
 }
+
+export type ContextManagerFactory<G extends SXLGlobalContext> = (
+    globalContext: G
+) => ContextManager<G>;

@@ -3,8 +3,9 @@ const config = {
     verbose: true,
     preset: "ts-jest",
     moduleNameMapper: {
-        "^@/(.*)$": "<rootDir>/src/$1",
-    },
+        "^@tests/(.*)$": "<rootDir>/tests/$1",
+        "^@/(.*)$": "<rootDir>/src/$1"
+    }
     // transform: {
     //   "\\.[jt]sx?$": "tsc",
     //   "\\.css$": "some-css-transformer",

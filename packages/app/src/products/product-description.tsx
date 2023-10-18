@@ -13,14 +13,18 @@ async function ProductDetails({ productId }: { productId: string }) {
         <div>
             <h1>{product.name}</h1>
             <p>{product.description}</p>
-            {/* <img src="/img1.jpg" style={{ width: "100%" }} /> */}
+            <img
+                src="/product-image.jpg"
+                alt="Product image"
+                style={{ width: "577px", height: "383" }}
+            />
         </div>
     );
 }
 
 export function ProductDescription({
     productIndexStart,
-    productId,
+    productId
 }: {
     productIndexStart?: number;
     productId: string;

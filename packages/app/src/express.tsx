@@ -1,93 +1,122 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import path from "path";
 import express from "express";
-import { SXLGlobalContext } from "lean-jsx/src/types/context";
-import { renderWithTemplate, sxlMiddleware } from "lean-jsx/dist/server";
+// import { renderWithTemplate, sxlMiddleware } from "lean-jsx/dist/server";
+import LeanApp from "./engine";
 import bodyParser from "body-parser";
-import { RequestQueryParams } from "./context";
 import { Home } from "./home/home";
 import { ProductDescription } from "./products/product-description";
 import { DynamicProductList } from "./products/product-list";
+import compression from "compression";
+import { parseQueryParams } from "./context";
+import { shouldCompress } from "lean-jsx/dist/server";
 
-const ASSETS_PATH = path.resolve(__dirname, "./");
+/**
+ * Output path for the bundled assets:
+ * Default path: /assets (relative to the server script)
+ * Includes bundled JS and CSS
+ */
+const ASSETS_PATH = path.resolve(__dirname, "/assets");
 
-declare module "lean-jsx/src/types/context" {
-    interface SXLGlobalContext extends RequestQueryParams {}
-}
+/**
+ * Output path for the "public" files:
+ * Default output: / (relative to the server script)
+ * Includes all resources from the "public" directory.
+ */
+const PUBLIC_PATH = __dirname;
 
-function isStringRepresentingBoolean(str: string) {
-    return str === "true" || str === "false";
-}
+/**
+ * Content-Security-Policy
+ */
+const CSP = `default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'`;
 
-function isStringRepresentingNumber(str: string) {
-    return !isNaN(parseFloat(str)) && str.trim() !== "";
-}
-
-function toGlobalState(args: Record<string, unknown>): SXLGlobalContext {
-    return Object.fromEntries(
-        Object.entries(args).map(([key, value]) => {
-            if (typeof value !== "string") {
-                return [key, value];
-            }
-            if (isStringRepresentingNumber(value)) {
-                return [key, parseFloat(value)];
-            }
-            if (isStringRepresentingBoolean(value)) {
-                return [key, value === "true"];
-            }
-            return [key, value];
-        })
-    );
-}
-
+/**
+ * Create the Express server
+ */
 function createServer() {
+    const logger = LeanApp.logger({
+        defaultLogLevel: "info"
+    });
     const app = express();
+
     app.use(bodyParser.urlencoded({ extended: true }));
-    app.use("/", (req, res, next) => {
-        if (/(jpe?g|png|gif)/.test(req.originalUrl)) {
-            const md = express.static(ASSETS_PATH);
-            md.call(null, req, res, next);
-        } else {
-            next();
-        }
-    });
 
-    app.use("/robots.txt", (req, res) => {
-        res.send(`User-agent: *
-    Allow: /`);
-    });
-
-    app.use("/assets", express.static(ASSETS_PATH + "/assets"));
     app.use(
-        sxlMiddleware({
-            components: [DynamicProductList],
+        compression({
+            filter: shouldCompress
         })
     );
 
-    app.get("/product/:productId", async (req, res) => {
-        const productId = req.params["productId"];
-        const params = toGlobalState(req.query);
+    app.use(
+        "/",
+        express.static(PUBLIC_PATH, {
+            index: false,
+            maxAge: "30d",
+            dotfiles: "ignore"
+        })
+    );
 
-        await renderWithTemplate(
-            res,
+    app.use(
+        LeanApp.expressLogging({
+            defaultLogLevel: "info",
+            file: {
+                error: {
+                    destination: path.resolve(__dirname, "logs", "error.json")
+                }
+            }
+        })
+    );
+
+    // Configure the lean.jsx middleware:
+    app.use(
+        LeanApp.middleware({
+            components: [DynamicProductList],
+            /**
+             * Set custom response attributes.
+             * @param resp - the server response, before streaming
+             *  the page content to the browser.
+             * @returns  - the configured response
+             */
+            configResponse: resp => resp.set("Content-Security-Policy", CSP),
+            globalContextParser: args => parseQueryParams(args)
+        })
+    );
+
+    // Configure a page for a specific product
+    app.get("/product/:productId", async (req, res, next) => {
+        const productId = req.params["productId"];
+        const globalContext = parseQueryParams(req);
+
+        await LeanApp.renderWithTemplate(
+            res
+                .set("Content-Security-Policy", CSP)
+                .set("Transfer-Encoding", "chunked"),
             <ProductDescription productId={productId} />,
+            globalContext,
             {
-                templatePath: path.resolve(ASSETS_PATH, "./index.html"),
-                globalContext: params,
+                templateName: "index"
+            },
+            next
+        );
+    });
+
+    // configure the main page:
+    app.use("/", async (req, res) => {
+        const globalContext = parseQueryParams(req);
+
+        await LeanApp.renderWithTemplate(
+            res
+                .set("Content-Security-Policy", CSP)
+                .set("Transfer-Encoding", "chunked"),
+            <Home />,
+            globalContext,
+            {
+                templateName: "index"
             }
         );
     });
 
-    app.use("/", async (req, res) => {
-        const params = toGlobalState(req.query);
-
-        await renderWithTemplate(res, <Home />, {
-            templatePath: path.resolve(ASSETS_PATH, "./index.html"),
-            globalContext: params,
-        });
-    });
-
-    console.log("Listening in port 5173");
+    logger.info("Listening in port 5173");
     app.listen(5173);
 }
 

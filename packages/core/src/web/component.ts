@@ -1,58 +1,54 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type{ GetDynamicComponent } from "../components/lazy";
+
 export interface DynamicDataComponent extends Partial<HTMLElement> {
     "data-id": string;
 }
 
-export class DynamicComponent
-    extends HTMLElement
-    implements DynamicDataComponent
-{
+/**
+ * A native web component for asynchronous/dynamic rendering.
+ * 
+ * Not meant to be used directly by developers, as it should be accessed
+ * through {@link GetDynamicComponent}
+ */
+export class DynamicComponent extends HTMLElement
+    implements DynamicDataComponent {
     "data-id": string;
+    domParser: DOMParser;
 
     isLoading = false;
+
+    constructor() {
+        super();
+        this.domParser = new DOMParser();
+    }
 
     static get observedAttributes() {
         return ["data-id"];
     }
 
-    constructor() {
-        super();
-        // this.attachShadow({ mode: "open" });
-        // if (this.shadowRoot) {
-        // this.innerHTML = `
-        //         <div id="data-container">
-        //           ${this.innerHTML}
-        //         </div>
-        //       `;
-        // }
-    }
-
     connectedCallback() {
-        this.innerHTML = `
-            <div id="data-container">
-              ${this.innerHTML}
-            </div>
-          `;
+        // Prevent triggering the data fetch again
+        // if it's already in progress
         if (this.isLoading) {
             return;
         }
+
         const dataId = this.getAttribute("data-id");
         this.isLoading = true;
         void fetch(`/components/${dataId}`)
-            .then((response) => response.text())
-            .then((data) => {
-                const div = document.createElement("div");
-                div.innerHTML = data;
-                const renderedContent = div.querySelector("template") ?? div;
-
-                const container = this?.firstElementChild;
-                // TODO: Handle failures
-                if (container) {
-                    container.innerHTML = renderedContent?.innerHTML ?? "";
-                } else {
-                    console.debug(
-                        "Could not find an element inside DynamicComponent"
-                    );
-                }
+            .then(response => response.text())
+            .then(data => {
+                const responseDOM = this.domParser.parseFromString(
+                    data,
+                    "text/html"
+                );
+                const fragment = responseDOM.createDocumentFragment()
+                Array.from(responseDOM.body.children).forEach(child => {
+                    fragment.appendChild(child)
+                })
+                this.replaceWith(fragment)
+                // this.replaceChildren(fragment);
             })
             .finally(() => {
                 this.isLoading = false;
@@ -66,7 +62,6 @@ export class DynamicComponent
     }
 
     static register() {
-        console.debug("Registering dynamic component...");
         if (!customElements.get("dynamic-component")) {
             customElements.define("dynamic-component", DynamicComponent);
         }

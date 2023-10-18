@@ -1,4 +1,5 @@
 body {
+    margin: 0.5em;
     background-color: black;
     color: white;
   }
@@ -6,15 +7,18 @@ body {
   main > * {
     padding: 1em;
   }
+
+  main > h1 {
+    padding-top:0;
+    margin-top:2rem;
+  }
   
   .costly {
     background-color: red;
   }
   
-  
-  
   dynamic-component {
-    display: block;
+    display: contents;
   }
   
   /***** PAGE ****/
@@ -33,7 +37,7 @@ body {
   .page {
     display: grid;
     grid-template-columns: [left] var(--aside-width) [center] calc(
-        100vw - var(--aside-width)
+        100% - var(--aside-width)
       );
     grid-template-rows: [top] max(var(--nav-height), max-content) [content] 100vh;
   }
@@ -69,6 +73,9 @@ body {
   aside {
     grid-column: 1;
     grid-row: 2;
+    & h2 {
+        margin-top:2rem;
+    }
   }
   
   main {
@@ -84,36 +91,6 @@ body {
     border-right: solid blue;
     padding: 0;
   }
-  
-  
-  .loading {
-    pointer-events: none;
-    & h3,& p {
-    animation: rolling 5s linear infinite;
-    background: linear-gradient(90deg, #858484, #6a6a6a, #858484);
-    border-radius: 0.2em;
-    filter: blur(0.5px);
-  }
-  & h3 {
-    min-height: 1rem;
-    margin-top: 1px;
-  }
-  
-  & p {
-    min-height: 2rem;
-  }
-  }
-  
-  @keyframes rolling {
-    0% {
-      background-position: 50em 0;
-    }
-    100% {
-      background-position: 0 0;
-    }
-  }
-  
-  
   
   .product {
     & > h3 {
@@ -133,4 +110,39 @@ body {
       background-color: var(--product-background-color--hover);
     }
   }
+
+
+  .loading {
+    height: 2em;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
+     border-radius: 0.2em;
+    filter: blur(0.5px);
+    will-change: transform;
+  }
+  
+  .loading:before {
+    --gradient-start-color: #453e3e;
+    --gradient-end-color: #555454;
+    content: " ";
+    width: 200%;
+    z-index: 1;
+    animation: rolling 1s linear infinite;
+    min-height: 2em;
+    min-width: 200px;
+    display: block;
+    position: absolute;
+    overflow-x: hidden;
+    background: repeating-linear-gradient(to right, var( --gradient-start-color), var(--gradient-end-color), var( --gradient-start-color) 33.3%);
+  }
+  
+   @keyframes rolling {
+      0% {
+          transform: translateX(-33.3%);
+      }
+      100% {
+          transform: translateX(0);
+      }
+    }
   

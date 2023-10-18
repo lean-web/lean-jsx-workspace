@@ -6,18 +6,19 @@ import {
     isFunctionNode,
     isPromise,
     isStaticNode,
-    unwrapFragments,
+    unwrapFragments
 } from "../jsx-utils";
 import {
     ContextManager,
     SXLElementWithContext,
-    isAsyncElementWithContext,
+    isAsyncElementWithContext
 } from "@/jsx/context/context-manager";
 import { SXLGlobalContext } from "lean-jsx/src/types/context";
 import {
     decorateContext,
-    wirePlaceholder,
+    wirePlaceholder
 } from "@/jsx/context/context-decorator";
+import { ILogger } from "@/jsx/logging/logger";
 
 class SubStack {
     doneList: string[] = [];
@@ -27,7 +28,7 @@ class SubStack {
         this.doneList = [...this.doneList, ...another.doneList];
         this.inProgressStack = [
             ...this.inProgressStack,
-            ...another.inProgressStack,
+            ...another.inProgressStack
         ];
     }
 }
@@ -39,7 +40,7 @@ interface JSXStackOptions {
 const MARKERS = {
     ASYNC_START: "ASYNC_START",
     ASYNC_END: "ASYNC_END",
-    END: "END",
+    END: "END"
 };
 
 type JSXStackEvents = keyof typeof MARKERS;
@@ -56,15 +57,20 @@ export class JSXStack<G extends SXLGlobalContext> {
     doneList: string[] = [];
     inProgressStack: Array<SXL.StaticElement | string> = [];
     eventListeners: JSXStackEventMap = {};
+    started: boolean = false;
 
     asyncInProgress: Promise<void>[] = [];
     private contextManager: ContextManager<G>;
+    private logger: ILogger;
 
-    constructor(globalContext: G, options?: JSXStackOptions) {
-        this.contextManager = new ContextManager(globalContext, {
-            sync: options?.sync ?? false,
-        });
+    constructor(
+        logger: ILogger,
+        contextManager: ContextManager<G>,
+        options?: JSXStackOptions
+    ) {
+        this.contextManager = contextManager;
         this.options = options ?? { sync: false };
+        this.logger = logger;
     }
 
     on(ev: JSXStackEvents, callback: () => void) {
@@ -73,7 +79,7 @@ export class JSXStack<G extends SXLGlobalContext> {
     }
 
     fire(ev: JSXStackEvents) {
-        this.eventListeners[ev]?.forEach((cb) => cb());
+        this.eventListeners[ev]?.forEach(cb => cb());
     }
 
     private wrap(element: SXL.StaticElement): SXLElementWithContext {
@@ -92,7 +98,7 @@ export class JSXStack<G extends SXLGlobalContext> {
         if (isStaticNode(element) && element.type === "fragment") {
             element.children
                 .reverse()
-                .forEach((child) => localStack.inProgressStack.push(child));
+                .forEach(child => localStack.inProgressStack.push(child));
             return;
         }
 
@@ -102,10 +108,11 @@ export class JSXStack<G extends SXLGlobalContext> {
             throw new Error("Resolved async element should have an ID");
         }
 
+        this.logger.debug("Pushing async component");
         localStack.inProgressStack.push(MARKERS.ASYNC_END);
         localStack.inProgressStack.push(wirePlaceholder(element.props.id));
         localStack.inProgressStack.push(close);
-        element.children.reverse().forEach((child) => {
+        element.children.reverse().forEach(child => {
             localStack.inProgressStack.push(child);
         });
 
@@ -123,7 +130,7 @@ export class JSXStack<G extends SXLGlobalContext> {
         if (isStaticNode(element) && element.type === "fragment") {
             element.children
                 .reverse()
-                .forEach((child) => this.inProgressStack.push(child));
+                .forEach(child => this.inProgressStack.push(child));
             return;
         }
 
@@ -140,12 +147,19 @@ export class JSXStack<G extends SXLGlobalContext> {
             this.inProgressStack.push(jsCode);
         }
         this.inProgressStack.push(close);
-        element.children.reverse().forEach((child) => {
+        element.children.reverse().forEach(child => {
             this.inProgressStack.push(child);
         });
     }
 
     async push(element: string | SXL.Element) {
+        if (!this.started) {
+            this.started = true;
+            this.logger.debug(
+                { sync: this.options.sync },
+                "Start processing JSX element"
+            );
+        }
         if (isTextNode(element)) {
             this.doneList.push(element);
         } else if (isPromise(element)) {
@@ -154,7 +168,7 @@ export class JSXStack<G extends SXLGlobalContext> {
                 return;
             }
 
-            const p = element.then((e) => {
+            const p = element.then(e => {
                 queueMicrotask(() => {
                     const currentPromise = this.asyncInProgress.indexOf(p);
                     this.asyncInProgress.splice(currentPromise, 1);
@@ -167,7 +181,7 @@ export class JSXStack<G extends SXLGlobalContext> {
             const children = unwrapFragments(element);
             children
                 .reverse()
-                .forEach((child) => this.inProgressStack.push(child));
+                .forEach(child => this.inProgressStack.push(child));
         } else {
             const wrapped = this.wrap(element);
 
@@ -187,7 +201,7 @@ export class JSXStack<G extends SXLGlobalContext> {
         this.doneList = [...this.doneList, ...subStack.doneList];
         this.inProgressStack = [
             ...subStack.inProgressStack,
-            ...this.inProgressStack,
+            ...this.inProgressStack
         ];
     }
 
@@ -221,6 +235,9 @@ export class JSXStack<G extends SXLGlobalContext> {
         const last = this.doneList.shift();
         if (!last) {
             this.fire("END");
+            this.logger.debug(
+                "Finished processing all JSX elements in the stack"
+            );
         }
 
         return last;
@@ -233,45 +250,72 @@ interface AdditionalChunks {
     sync?: boolean;
 }
 
+export type JSXStreamOptions = Partial<ReadableOptions> & AdditionalChunks;
+
 export class JSXStream<G extends SXLGlobalContext> extends Readable {
     private root: SXL.Element;
     private jsxStack: JSXStack<G>;
     private pre: string[];
     private post: string[];
+    private beforeEndHandler?: (stream: JSXStream<G>) => void;
 
     constructor(
         root: SXL.Element,
-        globalContext: G,
-        options?: Partial<ReadableOptions> & AdditionalChunks
+        contextManager: ContextManager<G>,
+        logger: ILogger,
+        options?: JSXStreamOptions
     ) {
         super({ ...options, encoding: "utf-8" });
         this.pre = options?.pre ?? [];
         this.post = options?.post ?? [];
         this.root = root;
-        this.jsxStack = new JSXStack(globalContext, {
-            sync: options?.sync ?? false,
+        this.jsxStack = new JSXStack(logger, contextManager, {
+            sync: options?.sync ?? false
         });
+    }
+
+    beforeEnd(handler: (stream: JSXStream<G>) => void) {
+        this.beforeEndHandler = handler;
     }
 
     async init() {
         await this.jsxStack.push(this.root);
     }
 
+    // push(chunk: string | null, encoding?: BufferEncoding | undefined): boolean {
+    //     // this.logger.debug({ chunk }, "Push...");
+    //     return this.push(chunk, encoding);
+    // }
+
+    onFlush() {}
+
     _read(): void {
         if (this.pre.length) {
-            this.push(this.pre.shift());
+            const shifted = this.pre.shift();
+            if (shifted) {
+                this.push(shifted);
+            }
             return;
         }
-        void this.jsxStack.pop().then((chunk) => {
+        void this.jsxStack.pop().then(chunk => {
             if (!chunk) {
-                this.post.forEach((ch) => {
+                this.post.forEach(ch => {
                     this.push(ch);
                 });
-
+                // if (this.beforeEndHandler) {
+                //     this.beforeEndHandler(this);
+                // }
                 this.push(null);
+                return;
             }
 
             this.push(chunk);
         });
     }
 }
+
+export type JSXStreamFactory<G extends SXLGlobalContext> = (
+    root: SXL.Element,
+    globalContext: G,
+    opts: JSXStreamOptions
+) => JSXStream<G>;
