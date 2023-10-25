@@ -44,7 +44,7 @@ const jsxToHtmlMap = {
     srcDoc: "srcdoc",
     srcLang: "srclang",
     srcSet: "srcset",
-    useMap: "usemap",
+    useMap: "usemap"
 };
 
 const jsxToHtmlAriaMap = {
@@ -93,7 +93,7 @@ const jsxToHtmlAriaMap = {
     ariaValueMax: "aria-valuemax",
     ariaValueMin: "aria-valuemin",
     ariaValueNow: "aria-valuenow",
-    ariaValueText: "aria-valuetext",
+    ariaValueText: "aria-valuetext"
 };
 
 function camelToDashed(str: string): string {
@@ -150,7 +150,7 @@ function flatten(props: SXL.Props): [string, string | number][] {
             // TODO
             return Object.entries(value as DOMStringMap).map(([dk, dv]) => [
                 /^data-/.test(dk) ? dk : `data-${dk}`,
-                dv,
+                dv
             ]) as [[string, string | number]];
         }
         if (/^data-/.test(key)) {
@@ -159,7 +159,9 @@ function flatten(props: SXL.Props): [string, string | number][] {
 
         if (typeof value !== "string" && typeof value !== "number") {
             throw new Error(
-                `Not implemented: Handing property ${key} with value ${value}`
+                `Not implemented: Handing property ${key} with value ${JSON.stringify(
+                    value
+                )}`
             );
         }
         return [[key, value]];
@@ -192,7 +194,7 @@ export class JSXToHTMLUtils {
 
         return [
             args.length > 0 ? `<${jsx.type} ${args}>` : `<${jsx.type}>`,
-            `</${jsx.type}>`,
+            `</${jsx.type}>`
         ];
     }
 }

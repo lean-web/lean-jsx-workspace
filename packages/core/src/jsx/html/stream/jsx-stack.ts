@@ -6,19 +6,19 @@ import {
     isFunctionNode,
     isPromise,
     isStaticNode,
-    unwrapFragments
+    unwrapFragments,
+    isAsyncGen
 } from "../jsx-utils";
-import {
-    ContextManager,
-    SXLElementWithContext,
-    isAsyncElementWithContext
-} from "@/jsx/context/context-manager";
+import { ContextManager } from "@/jsx/context/context-manager";
 import { SXLGlobalContext } from "lean-jsx/src/types/context";
 import {
     decorateContext,
     wirePlaceholder
 } from "@/jsx/context/context-decorator";
 import { ILogger } from "@/jsx/logging/logger";
+import { ComponentHandlerMap } from "@/jsx/component-handlers/handler-map";
+import { ParsedComponent } from "@/jsx/component-handlers";
+import { TrackablePromise } from "./stream-utils/trackable-promise";
 
 class SubStack {
     doneList: string[] = [];
@@ -82,16 +82,6 @@ export class JSXStack<G extends SXLGlobalContext> {
         this.eventListeners[ev]?.forEach(cb => cb());
     }
 
-    private wrap(element: SXL.StaticElement): SXLElementWithContext {
-        if (isFunctionNode(element)) {
-            return this.contextManager.fromFunction(element);
-        } else if (isClassNode(element)) {
-            return this.contextManager.fromClass(element);
-        } else {
-            return this.contextManager.fromStaticElement(element);
-        }
-    }
-
     processElementInSubqueue(element: SXL.StaticElement) {
         const localStack = new SubStack();
         // TODO: Find a better place to clean fragments
@@ -122,10 +112,7 @@ export class JSXStack<G extends SXLGlobalContext> {
         this.mergeSubstack(localStack);
     }
 
-    async processElement(
-        element: SXL.StaticElement,
-        wrap: SXLElementWithContext
-    ) {
+    async processElement(element: SXL.StaticElement, wrap: ParsedComponent) {
         // TODO: Find a better place to clean fragments
         if (isStaticNode(element) && element.type === "fragment") {
             element.children
@@ -152,7 +139,7 @@ export class JSXStack<G extends SXLGlobalContext> {
         });
     }
 
-    async push(element: string | SXL.Element) {
+    async push(element: string | SXL.Element | SXL.AsyncElement) {
         if (!this.started) {
             this.started = true;
             this.logger.debug(
@@ -182,14 +169,25 @@ export class JSXStack<G extends SXLGlobalContext> {
             children
                 .reverse()
                 .forEach(child => this.inProgressStack.push(child));
+        } else if (isAsyncGen(element)) {
+            // TODO
+            throw new Error("Not implemented");
         } else {
-            const wrapped = this.wrap(element);
+            // const wrapped = this.wrap(element);
+            const wrapped = ComponentHandlerMap.map(handler =>
+                handler(element, this.contextManager)
+            ).find(el => el);
 
-            if (wrapped.placeholder && !this.options.sync) {
-                await this.processElement(wrapped.placeholder, wrapped);
+            if (!wrapped) {
+                // TODO:
+                throw new Error("Not implemented");
             }
 
-            if (isAsyncElementWithContext(wrapped)) {
+            if (wrapped.loading && !this.options.sync) {
+                await this.processElement(await wrapped.loading, wrapped);
+            }
+
+            if (wrapped.element instanceof TrackablePromise) {
                 await this.push(wrapped.element.promise);
             } else {
                 await this.processElement(wrapped.element, wrapped);

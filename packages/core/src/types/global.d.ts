@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 /// <reference lib="dom" />
 
@@ -55,15 +56,24 @@ declare global {
             globalContext?: G;
         }
 
+        export type AsyncGenElement = AsyncGenerator<
+            SXL.StaticElement,
+            SXL.StaticElement,
+            never
+        >;
+
         /**
          * A function that returns a JSX node (usually "jsxDEV" or "jsx")
          */
-        export type NodeFactory = (args: Props) => StaticElement | AsyncElement;
+        export type NodeFactory<P extends SXL.Props> = (
+            args: P
+        ) => StaticElement | AsyncElement | AsyncGenElement;
 
         /**
          * The types for a Class Component.
          */
-        export interface ClassComponent {
+        export interface ClassComponent<P extends SXL.Props> {
+            props: P;
             /**
              * Render a temporary placeholder that will be replaced by the
              * return value of "renderLazy"
@@ -78,16 +88,28 @@ declare global {
         /**
          * A reference to the {@link ClassComponent} constructor.
          */
-        export interface ClassFactory {
-            new (props: Props | undefined): ClassComponent;
+        export interface ClassFactory<P extends SXL.Props> {
+            new (props: P): ClassComponent<unknown>;
         }
+
+        export type AsyncGenFactory = <P>(
+            props: P & SXL.Props
+        ) => AsyncGenElement;
+
+        export type IntrinsicElement = {
+            type: string;
+            props: Props;
+            children: Children;
+            isDynamic?: boolean;
+            ctx?: Context<Record<string, unknown>>;
+        };
 
         /**
          * A narrowed-down type of {@link SXL.StaticElement}.
          * Used for class components.
          */
         export type ClassElement = {
-            type: ClassFactory;
+            type: ClassFactory<SXL.Props>;
             props: Props;
             children: Children;
             isDynamic?: boolean;
@@ -99,7 +121,15 @@ declare global {
          * Used for function components.
          */
         export type FunctionElement = {
-            type: NodeFactory;
+            type: (props: SXL.Props) => StaticElement | AsyncElement;
+            props: Props;
+            children: Children;
+            isDynamic?: boolean;
+            ctx?: Context<Record<string, unknown>>;
+        };
+
+        export type FunctionAsyncGenElement = {
+            type: (args: SXL.Props) => AsyncGenElement;
             props: Props;
             children: Children;
             isDynamic?: boolean;
@@ -107,10 +137,21 @@ declare global {
         };
 
         /**
+         * The union of the types of supported components.
+         * This is used to narrow elements of type {@link SXL.Element} into
+         * specific component types.
+         */
+        export type ComponentElementUnion =
+            | IntrinsicElement
+            | FunctionElement
+            | ClassElement
+            | FunctionAsyncGenElement;
+
+        /**
          * The properties of a JSX component.
          */
         export type StaticElement = {
-            type: string | NodeFactory | ClassFactory;
+            type: string | NodeFactory<SXL.Props> | ClassFactory<SXL.Props>;
             props: Props;
             children: Children;
             isDynamic?: boolean;
@@ -127,12 +168,25 @@ declare global {
          * A JSX component can returned by a regular, syncronous function as {@link SXL.StaticElement}
          * of by an async function (an async component) as {@link SXL.AsyncElement}
          */
-        export type Element = StaticElement | AsyncElement;
+        export type Element = StaticElement | AsyncElement | AsyncGenElement;
     }
 
     namespace JSX {
-        type Element = SXL.Element;
-        interface ElementClass extends SXL.ClassComponent {}
+        export type ElementType =
+            | keyof IntrinsicElements
+            | SXL.NodeFactory<any>
+            | SXL.AsyncGenFactory
+            | SXL.ClassFactory<any>;
+        type Element = SXL.StaticElement;
+        // interface ElementClass extends SXL.ClassComponent {
+        //     foo: "string";
+        // }
+        // type IntrinsicClassAttributes<T> = {
+        //     [K in keyof T]: T[K];
+        // };
+        interface ElementAttributesProperty {
+            props;
+        }
         interface IntrinsicElements {
             a: HTMLAttributes<HTMLAnchorElement>;
             abbr: HTMLAttributes<HTMLElement>;

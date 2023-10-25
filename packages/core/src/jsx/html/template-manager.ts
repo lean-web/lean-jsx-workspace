@@ -46,7 +46,7 @@ export class TemplateManager {
             );
             return [before, after];
         } else {
-            return [templateConf.head, ""];
+            return [templateConf.head, templateConf.tail];
         }
     }
 }

@@ -1,4 +1,3 @@
-import { JSXStack } from "@/jsx/html/stream/jsx-stack";
 import { describe, expect, test } from "@jest/globals";
 import { setupTests } from "@tests/test-container";
 
@@ -356,6 +355,110 @@ describe("jsx-stack.test", () => {
 
         expect(all).toMatchInlineSnapshot(`
             "<div><div data-placeholder="element-1"></div><p>E2</p></div><template id="element-1"><div data-leanjsx-error="true">An error ocurred</div></template><script>
+                sxl.fillPlaceHolder("element-1");  
+             </script>
+             "
+        `);
+    });
+
+    test("async gen function component", async () => {
+        const stack = jsxStack({ username: "Pedro" });
+        async function* E1() {
+            yield (<p>Loading</p>);
+            await Promise.resolve();
+            return <p>E1</p>;
+        }
+        void stack.push(
+            <div>
+                <E1 />
+                <p>E2</p>
+            </div>
+        );
+
+        let first = await stack.pop();
+        let all = "";
+
+        while (first) {
+            all += first;
+            first = await stack.pop();
+        }
+
+        expect(all).toMatchInlineSnapshot(`
+            "<div><div data-placeholder="element-1"><p>Loading</p></div><p>E2</p></div><template id="element-1"><p>E1</p></template><script>
+                sxl.fillPlaceHolder("element-1");  
+             </script>
+             "
+        `);
+    });
+
+    test("async gen function component - error before yielding", async () => {
+        const stack = jsxStack(
+            { username: "Pedro" },
+            { defaultLogLevel: "silent" }
+        );
+        function failingResource(): Promise<void> {
+            return Promise.reject();
+        }
+
+        async function* E1() {
+            throw new Error("Oh no!");
+            yield (<p>Loading</p>);
+
+            await failingResource();
+            return <p>E1</p>;
+        }
+        void stack.push(
+            <div>
+                <E1 />
+                <p>E2</p>
+            </div>
+        );
+
+        let first = await stack.pop();
+        let all = "";
+
+        while (first) {
+            all += first;
+            first = await stack.pop();
+        }
+
+        expect(all).toMatchInlineSnapshot(`
+            "<div><div data-placeholder="element-1"><div data-leanjsx-error="true">An error ocurred</div></div><p>E2</p></div><template id="element-1"><div data-leanjsx-error="true">An error ocurred</div></template><script>
+                sxl.fillPlaceHolder("element-1");  
+             </script>
+             "
+        `);
+    });
+
+    test("async gen function component - error after yielding", async () => {
+        const stack = jsxStack({ username: "Pedro" });
+        function failingResource(): Promise<void> {
+            return Promise.reject();
+        }
+
+        async function* E1() {
+            yield (<p>Loading</p>);
+
+            await failingResource();
+            return <p>E1</p>;
+        }
+        void stack.push(
+            <div>
+                <E1 />
+                <p>E2</p>
+            </div>
+        );
+
+        let first = await stack.pop();
+        let all = "";
+
+        while (first) {
+            all += first;
+            first = await stack.pop();
+        }
+
+        expect(all).toMatchInlineSnapshot(`
+            "<div><div data-placeholder="element-1"><p>Loading</p></div><p>E2</p></div><template id="element-1"><div data-leanjsx-error="true">An error ocurred</div></template><script>
                 sxl.fillPlaceHolder("element-1");  
              </script>
              "

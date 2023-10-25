@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { isAsyncGen } from "@/jsx/html/jsx-utils";
 import { SXLGlobalContext } from "lean-jsx/src/types/context";
 
 export function toQueryString(
@@ -29,9 +30,7 @@ interface ComponentArgs extends SXL.Props {
     loading: SXL.Element;
 }
 
-function isPromise(
-    jsx: SXL.StaticElement | SXL.AsyncElement | undefined
-): jsx is SXL.AsyncElement {
+function isPromise(jsx: SXL.Element | undefined): jsx is SXL.AsyncElement {
     return !!jsx && "then" in jsx;
 }
 
@@ -39,7 +38,7 @@ function isPromise(
  * A utility JSX component that allows async JSX components to display
  * loading state as a placeholder.
  */
-export class Lazy implements SXL.ClassComponent {
+export class Lazy implements SXL.ClassComponent<ComponentArgs> {
     props: ComponentArgs;
 
     constructor(props: ComponentArgs) {
@@ -58,7 +57,10 @@ export class Lazy implements SXL.ClassComponent {
 
     render(): SXL.StaticElement {
         if (isPromise(this.props.loading)) {
-            return (<></>) as SXL.StaticElement;
+            return <></>;
+        }
+        if (isAsyncGen(this.props.loading)) {
+            return <></>;
         }
         return this.props.loading;
     }
@@ -119,7 +121,7 @@ export interface DynamicController {
 export function GetDynamicComponent<T>(
     contentId: string,
     fetcher: () => Promise<T>,
-    render: (data: TrackedPromise<T>) => SXL.Element
+    render: (data: TrackedPromise<T>) => SXL.StaticElement | SXL.AsyncElement
 ): DynamicController {
     return {
         Render: (props: SXL.Props) => (

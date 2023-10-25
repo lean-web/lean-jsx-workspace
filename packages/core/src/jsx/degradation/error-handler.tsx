@@ -1,13 +1,8 @@
-import { isPromise } from "../html/jsx-utils";
+import { isAsyncGen, isPromise } from "../html/jsx-utils";
 import { ILogger } from "../logging/logger";
+import { getDefaultErrorComponent } from "./default-content";
 
 type ErrorType = "Custom" | "TemplateError" | "AsyncComponent" | "Component";
-
-type NarrowReturnType<T extends () => SXL.Element> = ReturnType<
-    T
-> extends SXL.StaticElement
-    ? SXL.StaticElement
-    : SXL.Element;
 
 export interface ErrorHandlerOptions {
     timesRetried?: number;
@@ -17,10 +12,26 @@ export interface ErrorHandlerOptions {
 export interface IErrorHandler {
     getFallback(context: Record<string, unknown>): SXL.StaticElement;
     reportError(errorType: ErrorType, err: Error): void;
-    withErrorHandling<T extends () => SXL.Element>(
-        handler: T,
-        options: ErrorHandlerOptions
-    ): NarrowReturnType<T>;
+    withErrorHandling<
+        T extends SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement
+    >(
+        handler: () => T,
+        { timesRetried, extraInfo }: ErrorHandlerOptions
+    ): T;
+}
+
+export function isRTAsync(
+    fn: () => SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement,
+    rv: SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement
+): fn is () => SXL.AsyncElement {
+    return isPromise(rv);
+}
+
+export function isRTAsyncGen(
+    fn: () => SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement,
+    rv: SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement
+): fn is () => SXL.AsyncElement {
+    return isAsyncGen(rv);
 }
 
 export class ErrorHandler implements IErrorHandler {
@@ -31,23 +42,23 @@ export class ErrorHandler implements IErrorHandler {
         this.logger = logger;
     }
 
-    getFallback(context: Record<string, unknown>): SXL.StaticElement {
-        return (
-            <div data-leanjsx-error>An error ocurred</div>
-        ) as SXL.StaticElement;
+    getFallback(_context: Record<string, unknown>): SXL.StaticElement {
+        return getDefaultErrorComponent();
     }
 
-    withErrorHandling<T extends () => SXL.Element>(
-        handler: T,
-        { timesRetried, extraInfo }: ErrorHandlerOptions
-    ): NarrowReturnType<T> {
+    withErrorHandling<
+        T extends SXL.Element | SXL.AsyncElement | SXL.AsyncGenElement
+    >(handler: () => T, { timesRetried, extraInfo }: ErrorHandlerOptions): T {
         try {
             const newElement = handler();
             if (isPromise(newElement)) {
                 return newElement.catch(err => {
                     this.reportError("AsyncComponent", err, extraInfo);
                     return this.getFallback({});
-                }) as NarrowReturnType<T>;
+                }) as T;
+            }
+            if (isAsyncGen(newElement)) {
+                return newElement;
             }
             return newElement;
         } catch (err) {
@@ -59,7 +70,7 @@ export class ErrorHandler implements IErrorHandler {
                 });
             }
             this.reportError("Component", err, extraInfo);
-            return this.getFallback({});
+            return this.getFallback({}) as T;
         }
     }
 

@@ -20,7 +20,18 @@ interface AsyncJSXWrapper {
     context: SXL.Context<Record<string, unknown>>;
 }
 
-export type SXLElementWithContext = SyncJSXWrapper | AsyncJSXWrapper;
+interface AsyncGenJSXWrapper {
+    id: ContextID;
+    element: TrackablePromise<SXL.StaticElement, unknown>;
+    placeholder: SXL.AsyncElement;
+    handlers: Array<HandlerPropAndValue>;
+    context: SXL.Context<Record<string, unknown>>;
+}
+
+export type SXLElementWithContext =
+    | SyncJSXWrapper
+    | AsyncJSXWrapper
+    | AsyncGenJSXWrapper;
 
 export function isAsyncElementWithContext(
     element: SXLElementWithContext
@@ -28,6 +39,16 @@ export function isAsyncElementWithContext(
     return (
         element.element instanceof TrackablePromise ||
         isPromise(element.element)
+    );
+}
+
+export function isAsyncGenElementWithContext(
+    element: SXLElementWithContext
+): element is AsyncGenJSXWrapper {
+    return (
+        (element.element instanceof TrackablePromise ||
+            isPromise(element.element)) &&
+        isPromise(element.placeholder)
     );
 }
 
@@ -45,7 +66,7 @@ export interface ContextManagerOptions {
 
 export class ContextManager<G extends SXLGlobalContext> {
     private options: ContextManagerOptions;
-    private errorHandler: IErrorHandler;
+    errorHandler: IErrorHandler;
     private uiden = UIDGenerator.new();
     private globalContext: G;
 
@@ -59,102 +80,58 @@ export class ContextManager<G extends SXLGlobalContext> {
         this.errorHandler = errorHandler;
     }
 
+    newIdAndContext(): [ContextID, SXL.Context<Record<string, unknown>>] {
+        return [this.uiden(), this.newContext()];
+    }
+
     newContext(): SXL.Context<Record<string, unknown>> {
         return new LocalContext();
     }
 
-    fromStaticElement(element: SXL.StaticElement): SXLElementWithContext {
-        const id = this.uiden();
-        const localCtx = this.newContext();
-
-        return this.processElement(id, localCtx, element);
+    getGlobalContext(): G {
+        return this.globalContext;
     }
 
-    fromFunction(element: SXL.FunctionElement): SXLElementWithContext {
-        const id = this.uiden();
-        const localCtx = this.newContext();
-
-        const newElement = this.errorHandler.withErrorHandling(
-            () =>
-                element.type.bind(localCtx)({
-                    ...element.props,
-                    children: element.children,
-                    globalContext: this.globalContext
-                }),
-            {
-                extraInfo: {
-                    componentFunction: element.type.name
-                }
-            }
-        );
-
-        return this.processElement(id, localCtx, newElement);
-    }
-
-    fromClass(element: SXL.ClassElement): SXLElementWithContext {
-        const id = this.uiden();
-
-        const localCtx = this.newContext();
-
-        const classNode = new element.type({
-            ...element.props,
-            children: element.children,
-            globalContext: this.globalContext
-        });
-
-        const { errorHandler } = this;
-
-        const placeholder = errorHandler.withErrorHandling(
-            () => classNode.render(),
-            {
-                extraInfo: {
-                    classComponent: classNode.render.bind(null).name
-                }
-            }
-        );
-        const lazyElement = errorHandler.withErrorHandling(
-            () => classNode.renderLazy(),
-            {
-                extraInfo: {
-                    classComponent: classNode.renderLazy.bind(null).name
-                }
-            }
-        );
-
-        return this.processElement(id, localCtx, lazyElement, placeholder);
-    }
-
-    private processElement(
+    processElement(
         id: ContextID,
         context: SXL.Context<Record<string, unknown>>,
-        element: SXL.Element,
-        placeholder?: SXL.StaticElement
+        element: SXL.StaticElement | SXL.AsyncElement,
+        placeholder?: SXL.StaticElement | SXL.AsyncElement
     ): SXLElementWithContext {
         if (isPromise(element)) {
             return {
                 id,
                 element: new TrackablePromise(
-                    element.then(element => {
+                    element.then(e => {
+                        if (!e) {
+                            console.trace(
+                                `Failed to decorated async element`,
+                                element
+                            );
+                            return this.errorHandler.getFallback({});
+                        }
                         // if operating in sync mode,
                         // we don't need to wrap the async element
                         // in a template
                         if (this.options.sync) {
-                            return element;
+                            return e;
                         }
-                        if (!element.props.dataset) {
-                            element.props.dataset = {};
+                        if (!e.props.dataset) {
+                            e.props.dataset = {};
                         }
                         return {
                             type: "template",
                             props: {
                                 id
                             },
-                            children: unwrapFragments(element)
+                            children: unwrapFragments(e)
                         };
                     }),
                     id
                 ),
-                placeholder: this.processPlaceholder(id, placeholder),
+                placeholder: isPromise(placeholder)
+                    ? placeholder?.then(p => this.processPlaceholder(id, p))
+                    : this.processPlaceholder(id, placeholder),
                 handlers: [],
                 context
             };
@@ -169,11 +146,10 @@ export class ContextManager<G extends SXLGlobalContext> {
         };
     }
 
-    private processHandlers(
+    processHandlers(
         id: ContextID,
         element: SXL.StaticElement
     ): Array<HandlerPropAndValue> {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/ban-types
         const handlers: Array<[string, unknown]> = Object.entries(
             element.props
         ).filter(([key, v]) => /^on/.test(key) || typeof v === "function");

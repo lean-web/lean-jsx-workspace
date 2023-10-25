@@ -7,7 +7,7 @@ export default defineConfig({
         "plugins/vite": "./src/plugins/vite/index.ts",
         "jsx/jsx-dev-runtime": "./src/jsx/core/jsx-dev-runtime.ts",
         "jsx/jsx-runtime": "./src/jsx/core/jsx-runtime.ts",
-        "web/sxl": "./src/web/index.ts",
+        "web/sxl": "./src/web/index.ts"
     },
     target: "es2018",
     format: ["esm", "cjs", "iife"],
@@ -16,5 +16,6 @@ export default defineConfig({
     clean: true,
     dts: true,
     globalName: "sxl",
+    external: ["lean-jsx/dist/web/sxl.global.js"]
     // cjsInterop: true,
 });

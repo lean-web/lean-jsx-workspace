@@ -7,34 +7,34 @@ describe("JSXToHTMLUtils", () => {
         [<p>Hello</p>, "<p></p>"],
         [<p data-some-attr="true">Hello</p>, '<p data-some-attr="true"></p>'],
         [
-            <button onclick={(ev) => console.log(ev)}>Click me</button>,
-            "<button></button>",
+            <button onclick={ev => console.log(ev)}>Click me</button>,
+            "<button></button>"
         ],
         [
-            <button data-action="click" onclick={(ev) => console.log(ev)}>
+            <button data-action="click" onclick={ev => console.log(ev)}>
                 Click me
             </button>,
-            '<button data-action="click"></button>',
+            '<button data-action="click"></button>'
         ],
         [
             <div style={{ backgroundColor: "red" }}></div>,
-            '<div style="background-color: red;"></div>',
+            '<div style="background-color: red;"></div>'
         ],
         [
             <div
                 style={{
                     backgroundColor: "red",
-                    fontFamily: "Arial, Helvetica",
+                    fontFamily: "Arial, Helvetica"
                 }}
             ></div>,
-            '<div style="background-color: red; font-family: Arial, Helvetica;"></div>',
+            '<div style="background-color: red; font-family: Arial, Helvetica;"></div>'
         ],
         [
             <div
                 style={{ backgroundColor: "red" }}
                 onload={() => console.log("Loaded")}
             ></div>,
-            '<div style="background-color: red;"></div>',
+            '<div style="background-color: red;"></div>'
         ],
         [
             <div
@@ -42,7 +42,7 @@ describe("JSXToHTMLUtils", () => {
                 data-onclick="click"
                 onload={() => console.log("Loaded")}
             ></div>,
-            '<div style="background-color: red;" data-onclick="click"></div>',
+            '<div style="background-color: red;" data-onclick="click"></div>'
         ],
         [
             <div
@@ -51,8 +51,8 @@ describe("JSXToHTMLUtils", () => {
                 ariaLabel="div"
                 onload={() => console.log("Loaded")}
             ></div>,
-            '<div style="background-color: red;" data-onclick="click" aria-label="div"></div>',
-        ],
+            '<div style="background-color: red;" data-onclick="click" aria-label="div"></div>'
+        ]
     ];
 
     test("generated outerHTML is valid", () => {

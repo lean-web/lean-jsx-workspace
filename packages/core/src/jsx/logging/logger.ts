@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import pino, {type Logger as PinoLogger} from 'pino'
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent'; 
 
 export interface LoggerConfiguration {
     defaultLogLevel: LogLevel,
@@ -24,11 +26,11 @@ export interface ILogger {
 
 
 export function getPinoTransports(config:LoggerConfiguration) {
-
     const pinoPretty = config.stdout ?? true ? [{
-        level: 'info',
+        level: config.defaultLogLevel ?? 'info',
         target: 'pino-pretty',
-        options: {}
+        options: {
+        }
       }] : [];
 
     const fileHandlers = Object.entries(config.file ?? {}).map(([logLevel, config]) => ({
@@ -36,8 +38,6 @@ export function getPinoTransports(config:LoggerConfiguration) {
           target: 'pino/file',
           options: { destination: config.destination }
     }))
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return [...pinoPretty, ...fileHandlers]
 }
 
@@ -48,16 +48,23 @@ export class DefaultLogger implements ILogger {
     children: Map<string, ILogger> = new Map();
 
     constructor(config:LoggerConfiguration) {
+        console.log(config)
         this.config = config
-        // this.logger = pino({name:'LeanJS',
-        // level:config.defaultLogLevel,
-        // transport: {
-        //     target: 'pino-pretty'
-        //   }})
-        this.logger = pino(pino.transport({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const transport = pino.transport({
             targets: getPinoTransports(config),
+            worker: {
+                autoEnd: true
+            },
             dedupe:true,
-          }));
+          });
+         
+        const logger = pino(transport);
+      
+          this.logger = logger;
+          process.on("exit", () => {
+            transport.end();
+          })
 
     }
 

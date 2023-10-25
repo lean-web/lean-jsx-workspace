@@ -11,6 +11,7 @@ describe("DOM test", () => {
 
     test("Async flow", async () => {
         async function ACmp() {
+            await Promise.resolve();
             return <p>Hello world</p>;
         }
 
@@ -33,6 +34,7 @@ describe("DOM test", () => {
 
     test("Async flow with loading state", async () => {
         async function ACmp() {
+            await Promise.resolve();
             return <p>Hello world</p>;
         }
 

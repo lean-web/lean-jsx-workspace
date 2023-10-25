@@ -1,7 +1,6 @@
 import { readableToString } from "@/jsx/html/stream/stream-utils/readable-to-string";
 import { buildApp } from "@/server/express";
 import { describe, expect, test } from "@jest/globals";
-import { setupTests } from "@tests/test-container";
 
 describe("render-component-test", () => {
     test("description", async () => {

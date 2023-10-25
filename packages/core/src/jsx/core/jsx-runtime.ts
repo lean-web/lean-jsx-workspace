@@ -7,19 +7,19 @@ import { jsxElement, jsxFragment } from "./common";
  * @returns
  */
 export function jsx(
-  type: string | SXL.NodeFactory,
-  props: SXL.Props
-): SXL.StaticElement {
-  return jsxElement(type, props);
+    type: string | SXL.NodeFactory<SXL.Props>,
+    props: SXL.Props
+): SXL.StaticElement | Promise<SXL.StaticElement> {
+    return jsxElement(type, props);
 }
 
 export function jsxs(
-  type: string | SXL.NodeFactory,
-  props: SXL.Props
-): SXL.StaticElement {
-  return jsxElement(type, props);
+    type: string | SXL.NodeFactory<SXL.Props>,
+    props: SXL.Props
+): SXL.StaticElement | Promise<SXL.StaticElement> {
+    return jsxElement(type, props);
 }
 
 export function Fragment(props: SXL.Props): SXL.StaticElement {
-  return jsxFragment(props);
+    return jsxFragment(props);
 }

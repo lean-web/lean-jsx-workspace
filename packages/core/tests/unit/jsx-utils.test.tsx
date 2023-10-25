@@ -2,7 +2,7 @@ import { isFragmentNode, unwrapFragments } from "@/jsx/html/jsx-utils";
 import { describe, expect, test } from "@jest/globals";
 describe("jsx-utils.test", () => {
     test("unwrapFragments", () => {
-        const children = unwrapFragments((<>Hello</>) as SXL.StaticElement);
+        const children = unwrapFragments(<>Hello</>);
 
         expect(children).toMatchInlineSnapshot(`
 [
@@ -22,16 +22,16 @@ describe("jsx-utils.test", () => {
                 <>
                     <>Hello</>
                 </>,
-                true,
+                true
             ],
             [<p>Hello</p>, false],
             [
                 <p>
                     <>Hello</>
                 </p>,
-                false,
+                false
             ],
-            [<WithFragment />, false],
+            [<WithFragment />, false]
         ];
 
         testCases.forEach(([arg, expected]) => {
@@ -41,11 +41,9 @@ describe("jsx-utils.test", () => {
 
     test("unwrapFragments", () => {
         const children = unwrapFragments(
-            (
-                <>
-                    <>Hello</>
-                </>
-            ) as SXL.StaticElement
+            <>
+                <>Hello</>
+            </>
         );
 
         expect(children).toMatchInlineSnapshot(`
@@ -57,17 +55,14 @@ describe("jsx-utils.test", () => {
 
     test("unwrapFragments", () => {
         const children = unwrapFragments(
-            (
-                <>
-                    <p data-arg="one">Hello</p>
-                </>
-            ) as SXL.StaticElement
+            <>
+                <p data-arg="one">Hello</p>
+            </>
         );
 
         expect(children).toMatchInlineSnapshot(`
 [
   {
-    "actions": {},
     "children": [
       "Hello",
     ],

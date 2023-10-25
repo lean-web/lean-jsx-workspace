@@ -1,262 +1,227 @@
-import { Lazy } from "@/components";
-import {
-    ContextManager,
-    LocalContext,
-    isAsyncElementWithContext
-} from "@/jsx/context/context-manager";
-import { SXLGlobalContext } from "@/types/context";
 import { describe, expect, test } from "@jest/globals";
 import { setupTests } from "@tests/test-container";
 
-interface MyGlobalContext extends SXLGlobalContext {
-    username: string;
-}
-
 describe("context-manager.test", () => {
     const { contextManager: ctxManagerFactory } = setupTests();
-    test("fromStaticElement", () => {
+    test("processHandlers", () => {
         const contextManager = ctxManagerFactory({ username: "" });
 
-        const result = contextManager.fromStaticElement(
-            (<div data-attr="yes">Hello</div>) as SXL.StaticElement
+        const handlers = contextManager.processHandlers(
+            "myid",
+            <button onclick={() => console.log("Success")}></button>
         );
 
-        expect(result.placeholder).toBeUndefined();
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.element).toStrictEqual(<div data-attr="yes">Hello</div>);
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(0);
+        expect(handlers).toMatchInlineSnapshot(`
+            [
+              [
+                "onclick",
+                "() => console.log("Success")",
+              ],
+            ]
+        `);
     });
 
-    test("fromStaticElement - with handler", () => {
-        const onClick = ev => console.log(ev);
+    test("processElement - static", () => {
         const contextManager = ctxManagerFactory({ username: "" });
 
-        const result = contextManager.fromStaticElement(
-            (<button onclick={onClick}>Click</button>) as SXL.StaticElement
+        const processed = contextManager.processElement(
+            "myid",
+            { name: "Pedro" },
+            <button onclick={() => console.log("Success")}></button>
         );
 
-        expect(result.placeholder).toBeUndefined();
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.element).toStrictEqual({
-            actions: {
-                onclick: onClick
-            },
-            children: ["Click"],
-            props: {
-                dataset: {
-                    "data-action": "element-0"
+        expect(processed).toMatchInlineSnapshot(`
+            {
+              "context": {
+                "name": "Pedro",
+              },
+              "element": {
+                "children": [],
+                "props": {
+                  "dataset": {
+                    "data-action": "myid",
+                  },
+                  "onclick": "",
                 },
-                onclick: ""
-            },
-            type: "button"
-        });
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(1);
-        expect(result.handlers[0]).toStrictEqual([
-            "onclick",
-            onClick.toString()
-        ]);
+                "type": "button",
+              },
+              "handlers": [
+                [
+                  "onclick",
+                  "() => console.log("Success")",
+                ],
+              ],
+              "id": "myid",
+              "placeholder": undefined,
+            }
+        `);
     });
 
-    test("fromFunction", () => {
+    test("processElement - async with no loading state", async () => {
         const contextManager = ctxManagerFactory({ username: "" });
-        function Hello() {
-            return <p>Hello</p>;
+
+        async function MyComponent() {
+            await Promise.resolve();
+            return <p>Hello async</p>;
         }
-        const result = contextManager.fromFunction(
-            (<Hello />) as SXL.FunctionElement
+
+        const processed = contextManager.processElement(
+            "myid",
+            { name: "Pedro" },
+            MyComponent()
         );
 
-        expect(result.placeholder).toBeUndefined();
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.element).toStrictEqual(<p>Hello</p>);
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(0);
-    });
-
-    test("fromFunction: With handler", () => {
-        const contextManager = ctxManagerFactory({ username: "" });
-        const onClick = () => console.log("Hello");
-        function Hello() {
-            return <p onclick={onClick}>Hello</p>;
-        }
-        const result = contextManager.fromFunction(
-            (<Hello />) as SXL.FunctionElement
-        );
-
-        expect(result.placeholder).toBeUndefined();
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.element).toStrictEqual({
-            actions: {
-                onclick: onClick
-            },
-            children: ["Hello"],
-            props: {
-                dataset: {
-                    "data-action": "element-0"
+        await expect(processed.element).resolves.toMatchInlineSnapshot(`
+            {
+              "children": [
+                {
+                  "children": [
+                    "Hello async",
+                  ],
+                  "props": {
+                    "dataset": {},
+                  },
+                  "type": "p",
                 },
-                onclick: ""
-            },
-            type: "p"
-        });
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(1);
-        expect(result.handlers[0]).toStrictEqual([
-            "onclick",
-            onClick.toString()
-        ]);
-    });
+              ],
+              "props": {
+                "id": "myid",
+              },
+              "type": "template",
+            }
+        `);
 
-    test("fromFunction: With handler in function component", () => {
-        const contextManager = ctxManagerFactory({ username: "" });
-        const onClick = () => console.log("Hello");
-        function Hello({ onclick }: SXL.ComponentProps<MyGlobalContext>) {
-            return <button onclick={onclick}>Click</button>;
-        }
-        const result = contextManager.fromFunction(
-            (<Hello onclick={onClick} />) as SXL.FunctionElement
-        );
-
-        expect(result.placeholder).toBeUndefined();
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.element).toStrictEqual({
-            actions: {
-                onclick: onClick
-            },
-            children: ["Click"],
-            props: {
-                dataset: {
-                    "data-action": "element-0"
+        expect(processed.placeholder).toMatchInlineSnapshot(`
+            {
+              "children": [],
+              "props": {
+                "dataset": {
+                  "data-placeholder": "myid",
                 },
-                onclick: ""
-            },
-            type: "button"
-        });
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(1);
-        expect(result.handlers[0]).toStrictEqual([
-            "onclick",
-            onClick.toString()
-        ]);
+              },
+              "type": "div",
+            }
+        `);
     });
 
-    test("fromFunction: async", () => {
-        const contextManager = ctxManagerFactory({ username: "" });
-        const onClick = () => console.log("Hello");
-        async function Hello(): SXL.AsyncElement {
-            return new Promise(resolve =>
-                resolve(<p onclick={onClick}>Hello</p>)
-            );
-        }
-        const result = contextManager.fromFunction(
-            (<Hello />) as SXL.FunctionElement
-        );
-
-        expect(result.placeholder).toStrictEqual({
-            type: "div",
-            props: {
-                dataset: {
-                    "data-placeholder": "element-0"
-                }
-            },
-            children: []
-        });
-        expect(isAsyncElementWithContext(result)).toBeTruthy();
-        expect(result.element).toHaveProperty("then");
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(0);
-    });
-
-    test("fromClass", () => {
+    test("processElement - async with loading state", async () => {
         const contextManager = ctxManagerFactory({ username: "" });
 
-        const result = contextManager.fromClass(
-            (
-                <Lazy loading={<>Loading</>}>
-                    <p>Hello</p>
-                </Lazy>
-            ) as SXL.ClassElement
-        );
-
-        expect(result.placeholder).toStrictEqual({
-            type: "div",
-            props: {
-                dataset: {
-                    "data-placeholder": "element-0"
-                }
-            },
-            children: ["Loading"]
-        });
-        expect(isAsyncElementWithContext(result)).toBeTruthy();
-        expect(result.element).toHaveProperty("then");
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(0);
-    });
-
-    test("fromFunction: With local context", () => {
-        const contextManager = ctxManagerFactory({ username: "" });
-
-        interface HelloContext {
-            firstName: string;
+        async function MyComponent() {
+            await Promise.resolve();
+            return <p>Hello async</p>;
         }
 
-        function Hello(this: HelloContext) {
-            this.firstName = "Pedro";
-
-            return <p onclick={() => console.log(this.firstName)}>Hello</p>;
-        }
-        const result = contextManager.fromFunction(
-            (<Hello />) as SXL.FunctionElement
+        const processed = contextManager.processElement(
+            "myid",
+            { name: "Pedro" },
+            MyComponent(),
+            <p>Loading...</p>
         );
 
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.placeholder).toBeUndefined();
-        expect(result.element).toEqual({
-            children: ["Hello"],
-            actions: {
-                onclick: expect.any(Function)
-            },
-            props: {
-                dataset: {
-                    "data-action": "element-0"
+        await expect(processed.element).resolves.toMatchInlineSnapshot(`
+            {
+              "children": [
+                {
+                  "children": [
+                    "Hello async",
+                  ],
+                  "props": {
+                    "dataset": {},
+                  },
+                  "type": "p",
                 },
-                onclick: ""
-            },
-            type: "p"
-        });
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(1);
-        expect(result.handlers[0]).toStrictEqual([
-            "onclick",
-            "() => console.log(this.firstName)"
-        ]);
-        const expectedContext = new LocalContext();
-        expectedContext.firstName = "Pedro";
-        expect(result.context).toStrictEqual(expectedContext);
+              ],
+              "props": {
+                "id": "myid",
+              },
+              "type": "template",
+            }
+        `);
+
+        expect(processed.placeholder).toMatchInlineSnapshot(`
+            {
+              "children": [
+                {
+                  "children": [
+                    "Loading...",
+                  ],
+                  "props": {
+                    "dataset": {},
+                  },
+                  "type": "p",
+                },
+              ],
+              "props": {
+                "dataset": {
+                  "data-placeholder": "myid",
+                },
+              },
+              "type": "div",
+            }
+        `);
     });
 
-    test("fromFunction: With global context", () => {
-        const contextManager = ctxManagerFactory({ username: "pedro" });
+    test("processElement - async with async loading state", async () => {
+        const contextManager = ctxManagerFactory({ username: "" });
 
-        function Hello({ globalContext }: SXL.ComponentProps<MyGlobalContext>) {
-            return <div>Name: {globalContext?.username}</div>;
+        async function MyComponent() {
+            await Promise.resolve();
+            return <p>Hello async</p>;
         }
-        const result = contextManager.fromFunction(
-            (<Hello />) as SXL.FunctionElement
+
+        async function Loading() {
+            await Promise.resolve();
+            return <p>Loading</p>;
+        }
+
+        const processed = contextManager.processElement(
+            "myid",
+            { name: "Pedro" },
+            MyComponent(),
+            Loading()
         );
 
-        expect(isAsyncElementWithContext(result)).toBeFalsy();
-        expect(result.placeholder).toBeUndefined();
-        expect(result.element).toEqual({
-            children: ["Name: ", "pedro"],
-            actions: {},
-            props: {
-                dataset: {}
-            },
-            type: "div"
-        });
-        expect(result.id).toBeTruthy();
-        expect(result.handlers.length).toBe(0);
+        await expect(processed.element).resolves.toMatchInlineSnapshot(`
+            {
+              "children": [
+                {
+                  "children": [
+                    "Hello async",
+                  ],
+                  "props": {
+                    "dataset": {},
+                  },
+                  "type": "p",
+                },
+              ],
+              "props": {
+                "id": "myid",
+              },
+              "type": "template",
+            }
+        `);
+
+        await expect(processed.placeholder).resolves.toMatchInlineSnapshot(`
+            {
+              "children": [
+                {
+                  "children": [
+                    "Loading",
+                  ],
+                  "props": {
+                    "dataset": {},
+                  },
+                  "type": "p",
+                },
+              ],
+              "props": {
+                "dataset": {
+                  "data-placeholder": "myid",
+                },
+              },
+              "type": "div",
+            }
+        `);
     });
 });

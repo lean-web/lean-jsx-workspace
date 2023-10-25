@@ -13,7 +13,9 @@ export class QuerySelectors {
     }
 }
 
-export function decorateContext(element: SXLElementWithContext) {
+export function decorateContext(
+    element: Omit<SXLElementWithContext, "placeholder">
+) {
     if (element.handlers.length === 0) {
         return "";
     }

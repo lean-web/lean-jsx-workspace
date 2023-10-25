@@ -72,7 +72,7 @@ async function consumeStack(
 
 export async function jsxToDOMTest(jsx: SXL.Element) {
     const TestContainer = setupTests();
-    const stream = TestContainer.jsxStack<{}>({});
+    const stream = TestContainer.jsxStack<object>({});
     await stream.push(jsx);
 
     const doms: string[] = [];
