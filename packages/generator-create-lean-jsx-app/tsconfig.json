@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "types": ["node"],
     "jsx": "react-jsx", // support custom JSX
-    "jsxImportSource": "lean-jsx/dist/jsx",
+    "jsxImportSource": "lean-jsx/lib/jsx",
     "paths": {
       "@/": ["./generators/app/templates/src/"],
       "@/*": ["./generators/app/templates/src/*"]

@@ -5,7 +5,7 @@ import { parseQueryParams } from "@/context";
 import { App } from "@/components/app";
 import { DynamicMessage } from "@/components/slow";
 import LeanEngine from "./engine";
-import { shouldCompress } from "lean-jsx/dist/server";
+import { shouldCompress } from "lean-jsx/lib/server";
 
 /**
  * Output path for the "public" resources:
@@ -25,74 +25,74 @@ const CSP = `default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 
  * Create the Express Server
  */
 function createServer() {
-  const logger = LeanEngine.logger({
-    defaultLogLevel: "info",
-  });
-  const app = express();
-  /**
-   * Parse request parameters.
-   */
-  app.use(bodyParser.urlencoded({ extended: true }));
+    const logger = LeanEngine.logger({
+        defaultLogLevel: "info"
+    });
+    const app = express();
+    /**
+     * Parse request parameters.
+     */
+    app.use(bodyParser.urlencoded({ extended: true }));
 
-  /**
-   * Enable gzip compression for static resources.
-   */
-  app.use(
-    compression({
-      filter: shouldCompress,
-    })
-  );
-
-  /**
-   * Expose all files in ./dist as resources
-   */
-  app.use(
-    "/",
-    express.static(PUBLIC_PATH, {
-      index: false,
-      maxAge: "30d",
-      dotfiles: "ignore",
-    })
-  );
-
-  /**
-   * Configure the lean.jsx middleware:
-   */
-  app.use(
-    LeanEngine.middleware({
-      components: [DynamicMessage],
-      /**
-       * Set custom response attributes.
-       * @param resp - the server response, before streaming
-       *  the page content to the browser.
-       * @returns  - the configured response
-       */
-      configResponse: (resp) => resp.set("Content-Security-Policy", CSP),
-      globalContextParser: (args) => parseQueryParams(args),
-    })
-  );
-
-  /**
-   * Home page
-   */
-  app.use("/", async (req, res) => {
-    const globalContext = parseQueryParams(req);
-
-    await LeanEngine.renderWithTemplate(
-      res
-        .set("Content-Security-Policy", CSP)
-        .set("Transfer-Encoding", "chunked"),
-      // Return JSX component directly! :)
-      <App />,
-      globalContext,
-      {
-        templateName: "index",
-      }
+    /**
+     * Enable gzip compression for static resources.
+     */
+    app.use(
+        compression({
+            filter: shouldCompress
+        })
     );
-  });
 
-  logger.info("Listening in port 5173");
-  app.listen(5173);
+    /**
+     * Expose all files in ./dist as resources
+     */
+    app.use(
+        "/",
+        express.static(PUBLIC_PATH, {
+            index: false,
+            maxAge: "30d",
+            dotfiles: "ignore"
+        })
+    );
+
+    /**
+     * Configure the lean.jsx middleware:
+     */
+    app.use(
+        LeanEngine.middleware({
+            components: [DynamicMessage],
+            /**
+             * Set custom response attributes.
+             * @param resp - the server response, before streaming
+             *  the page content to the browser.
+             * @returns  - the configured response
+             */
+            configResponse: resp => resp.set("Content-Security-Policy", CSP),
+            globalContextParser: args => parseQueryParams(args)
+        })
+    );
+
+    /**
+     * Home page
+     */
+    app.use("/", async (req, res) => {
+        const globalContext = parseQueryParams(req);
+
+        await LeanEngine.renderWithTemplate(
+            res
+                .set("Content-Security-Policy", CSP)
+                .set("Transfer-Encoding", "chunked"),
+            // Return JSX component directly! :)
+            <App />,
+            globalContext,
+            {
+                templateName: "index"
+            }
+        );
+    });
+
+    logger.info("Listening in port 5173");
+    app.listen(5173);
 }
 
 createServer();

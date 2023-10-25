@@ -1,5 +1,5 @@
 const { resolve, basename, extname } = require("path");
-const { injectScript } = require("lean-jsx/dist/plugins/vite");
+const { injectScript } = require("lean-jsx/lib/plugins/vite");
 const packageConfig = require("./package.json");
 
 /**

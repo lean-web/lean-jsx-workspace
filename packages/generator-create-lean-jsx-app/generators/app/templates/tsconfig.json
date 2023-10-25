@@ -26,7 +26,7 @@
     "noImplicitAny": false,
 
     "jsx": "react-jsx", // support JSX
-    "jsxImportSource": "lean-jsx/dist/jsx",
+    "jsxImportSource": "lean-jsx/lib/jsx",
     "paths": {
       "@/": ["./src/"],
       "@/*": ["./src/*"]

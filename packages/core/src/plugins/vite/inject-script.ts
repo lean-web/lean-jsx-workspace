@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { Plugin } from "vite";
 
 /**
- * A Vite plugin to inject lean-jsx/dist/web/sxl.global.js into the
+ * A Vite plugin to inject lean-jsx/lib/web/sxl.global.js into the
  * main index.html document.
  *
  * This injection is needed because, by default, Vite bundles all JavaScript
@@ -23,9 +23,9 @@ export default function injectScript(packageName: string): Plugin {
             enforce: "post",
             transform(html, context) {
                 if (context.bundle) {
-                    const injectedFileName = Object.keys(context.bundle).find(
-                        (key) => /injected_/.test(key)
-                    );
+                    const injectedFileName = Object.keys(
+                        context.bundle
+                    ).find(key => /injected_/.test(key));
 
                     //   context.
                     if (injectedFileName) {
@@ -35,24 +35,24 @@ export default function injectScript(packageName: string): Plugin {
                                 {
                                     tag: "script",
                                     attrs: { src: `/${injectedFileName}` },
-                                    injectTo: "head",
-                                },
-                            ],
+                                    injectTo: "head"
+                                }
+                            ]
                         };
                     }
                 }
                 console.warn("No script to inject was found in the bundle");
-            },
+            }
         },
         generateBundle(options) {
             // Read the script content from the package
             const scriptContent = fs.readFileSync(
-                require.resolve("lean-jsx/dist/web/sxl.global.js"),
+                require.resolve("lean-jsx/lib/web/sxl.global.js"),
                 "utf-8"
             );
 
             // const loaded = await this.resolve(
-            //     "lean-jsx/dist/web/sxl.global.js"
+            //     "lean-jsx/lib/web/sxl.global.js"
             // );
 
             // Create an injected script asset
@@ -65,8 +65,8 @@ export default function injectScript(packageName: string): Plugin {
                 type: "prebuilt-chunk",
                 fileName: injectedFileName,
 
-                code: scriptContent,
+                code: scriptContent
             });
-        },
+        }
     };
 }

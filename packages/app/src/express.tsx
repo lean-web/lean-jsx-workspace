@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import path from "path";
 import express from "express";
-// import { renderWithTemplate, sxlMiddleware } from "lean-jsx/dist/server";
+// import { renderWithTemplate, sxlMiddleware } from "lean-jsx/lib/server";
 import LeanApp from "./engine";
 import bodyParser from "body-parser";
 import { Home } from "./home/home";
@@ -9,7 +9,7 @@ import { ProductDescription } from "./products/product-description";
 import { DynamicProductList } from "./products/product-list";
 import compression from "compression";
 import { parseQueryParams } from "./context";
-import { shouldCompress } from "lean-jsx/dist/server";
+import { shouldCompress } from "lean-jsx/lib/server";
 
 /**
  * Output path for the bundled assets:

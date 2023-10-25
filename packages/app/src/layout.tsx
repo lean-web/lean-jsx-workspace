@@ -1,17 +1,17 @@
-import { Lazy } from "lean-jsx/dist/server/components";
+import { Lazy } from "lean-jsx/lib/server/components";
 import { SXLGlobalContext } from "lean-jsx/src/types/context";
 
 import {
     DynamicProductList,
     ProductList,
-    ProductListLoading,
+    ProductListLoading
 } from "./products/product-list";
 
 import { Nav } from "./components/nav";
 
 function ProductListWrapper({
     productListStart,
-    globalContext,
+    globalContext
 }: {
     productListStart?: number;
     globalContext?: SXLGlobalContext;
@@ -34,7 +34,7 @@ function ProductListWrapper({
 
 export function Layout({
     productListStart,
-    children,
+    children
 }: SXL.Props & { productListStart?: number } & {
     globalContext?: SXLGlobalContext;
 }) {

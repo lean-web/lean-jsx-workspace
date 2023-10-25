@@ -9,6 +9,7 @@ export default defineConfig({
         "jsx/jsx-runtime": "./src/jsx/core/jsx-runtime.ts",
         "web/sxl": "./src/web/index.ts"
     },
+    outDir: "lib",
     target: "es2018",
     format: ["esm", "cjs", "iife"],
     splitting: false,
@@ -16,6 +17,6 @@ export default defineConfig({
     clean: true,
     dts: true,
     globalName: "sxl",
-    external: ["lean-jsx/dist/web/sxl.global.js"]
+    external: ["lean-jsx/lib/web/sxl.global.js"]
     // cjsInterop: true,
 });

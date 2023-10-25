@@ -1,4 +1,4 @@
-import { buildApp } from "lean-jsx/dist/server";
+import { buildApp } from "lean-jsx/lib/server";
 import path from "path";
 
 const INDEX_HTML_PATH = path.resolve(__dirname, "index.html");

@@ -1,4 +1,4 @@
-import { GetDynamicComponent, Lazy } from "lean-jsx/dist/server/components";
+import { GetDynamicComponent, Lazy } from "lean-jsx/lib/server/components";
 
 async function wait(time: number): Promise<void> {
     return new Promise(resolve => {

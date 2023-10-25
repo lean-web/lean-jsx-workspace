@@ -1,9 +1,15 @@
 {
     "name": "lean-jsx",
-    "version": "1.0.0",
-    "description": "",
+    "version": "0.0.1",
+    "author": "Pedro Marquez-Soto",
+    "license": "MPL-2.0",
+    "description": "Lean-JSX is a server-driven web framework that allows you to build HTML components using JSX-like syntax, but without relying on hefty client-side JavaScript libraries or frameworks.",
     "main": "index.js",
     "types": "./src/types/global.d.ts",
+    "files": [
+        "dist",
+        "./src/types"
+    ],
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
@@ -29,8 +35,6 @@
         "typedoc-plugin-missing-exports": "^2.1.0",
         "vite-plugin-dts": "^3.6.0"
     },
-    "author": "",
-    "license": "ISC",
     "dependencies": {
         "body-parser": "1.20.1",
         "env": "^0.0.2",
