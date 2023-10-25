@@ -48,7 +48,6 @@ export class DefaultLogger implements ILogger {
     children: Map<string, ILogger> = new Map();
 
     constructor(config:LoggerConfiguration) {
-        console.log(config)
         this.config = config
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const transport = pino.transport({

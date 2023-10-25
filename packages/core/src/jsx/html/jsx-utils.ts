@@ -107,10 +107,14 @@ export function isFragmentNode(
 }
 
 export function unwrapFragments(
-    element: SXL.StaticElement | string
+    element: SXL.StaticElement | string | number | boolean
 ): Array<SXL.StaticElement | string> {
-    if (typeof element === "string") {
-        return [element];
+    if (
+        typeof element === "string" ||
+        typeof element === "number" ||
+        typeof element === "boolean"
+    ) {
+        return [`${element}`];
     }
     if (element.type === "fragment") {
         const children = element.children.flatMap(child =>

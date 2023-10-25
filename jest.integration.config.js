@@ -18,10 +18,8 @@ module.exports = {
                 ]
             },
             testMatch: [
-                "<rootDir>/packages/core/tests/unit/**/*.test.ts",
-                "<rootDir>/packages/core/tests/integration/**/*.test.ts",
-                "<rootDir>/packages/core/tests/unit/**/*.test.tsx",
-                "<rootDir>/packages/core/tests/integration/**/*.test.tsx"
+                "<rootDir>/packages/core/tests/e2e/**/*.test.ts",
+                "<rootDir>/packages/core/tests/e2e/**/*.test.tsx"
             ]
         }
     ]

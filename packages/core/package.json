@@ -8,6 +8,7 @@
         "build": "tsup",
         "watch": "tsup --watch",
         "test": "jest",
+        "test:e2e": "jest -c ../../jest.integration.config.js",
         "docs": "npx typedoc --out docs"
     },
     "devDependencies": {

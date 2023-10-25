@@ -22,7 +22,7 @@ import { TrackablePromise } from "./stream-utils/trackable-promise";
 
 class SubStack {
     doneList: string[] = [];
-    inProgressStack: Array<SXL.StaticElement | string> = [];
+    inProgressStack: Array<SXL.StaticElement | string | number | boolean> = [];
 
     merge(another: SubStack) {
         this.doneList = [...this.doneList, ...another.doneList];
@@ -55,7 +55,7 @@ function isEventKey(str: string): str is JSXStackEvents {
 export class JSXStack<G extends SXLGlobalContext> {
     options: JSXStackOptions;
     doneList: string[] = [];
-    inProgressStack: Array<SXL.StaticElement | string> = [];
+    inProgressStack: Array<SXL.StaticElement | string | number | boolean> = [];
     eventListeners: JSXStackEventMap = {};
     started: boolean = false;
 
@@ -139,7 +139,9 @@ export class JSXStack<G extends SXLGlobalContext> {
         });
     }
 
-    async push(element: string | SXL.Element | SXL.AsyncElement) {
+    async push(
+        element: string | number | boolean | SXL.Element | SXL.AsyncElement
+    ) {
         if (!this.started) {
             this.started = true;
             this.logger.debug(
@@ -147,7 +149,9 @@ export class JSXStack<G extends SXLGlobalContext> {
                 "Start processing JSX element"
             );
         }
-        if (isTextNode(element)) {
+        if (typeof element === "number" || typeof element === "boolean") {
+            this.doneList.push(`${element}`);
+        } else if (isTextNode(element)) {
             this.doneList.push(element);
         } else if (isPromise(element)) {
             if (this.options.sync) {

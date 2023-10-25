@@ -35,7 +35,7 @@ declare global {
         /**
          * The children elements of a JSX component.
          */
-        export type Children = Array<string | StaticElement>;
+        export type Children = Array<string | number | boolean | StaticElement>;
 
         /**
          * The base properties that a JSX component can receive.

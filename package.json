@@ -6,12 +6,16 @@
         "packages/generator-create-lean-jsx-app",
         "packages/eslint-plugin-lean-jsx"
     ],
+    "scripts": {
+        "prepare": "husky install .config/husky"
+    },
     "devDependencies": {
         "@types/node": "^20.8.3",
         "@types/uuid": "^9.0.5",
         "@typescript-eslint/eslint-plugin": "^6.7.4",
         "@typescript-eslint/parser": "^6.7.4",
         "eslint": "^8.51.0",
+        "husky": "^8.0.3",
         "typescript": "^5.1.3"
     }
 }
