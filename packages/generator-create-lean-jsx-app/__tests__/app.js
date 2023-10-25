@@ -1,16 +1,16 @@
 "use strict";
-const path = require("path");
-const assert = require("yeoman-assert");
-const helpers = require("yeoman-test");
+import { join } from "path";
+import { file } from "yeoman-assert";
+import { run } from "yeoman-test";
 
 describe("generator-create-lean-jsx-app:app", () => {
-  beforeAll(() => {
-    return helpers
-      .run(path.join(__dirname, "../generators/app"))
-      .withPrompts({ someAnswer: true });
-  });
+    beforeAll(() => {
+        return run(join(__dirname, "../generators/app")).withPrompts({
+            someAnswer: true
+        });
+    });
 
-  it("creates files", () => {
-    assert.file(["dummyfile.txt"]);
-  });
+    it("creates files", () => {
+        file(["dummyfile.txt"]);
+    });
 });

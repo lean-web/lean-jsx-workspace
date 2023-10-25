@@ -1,82 +1,84 @@
 "use strict";
-const Generator = require("yeoman-generator");
-const chalk = require("chalk");
-const yosay = require("yosay");
-const path = require("path");
+import Generator from "yeoman-generator";
+import chalk from "chalk";
+import yosay from "yosay";
+import { join } from "path";
 
-module.exports = class extends Generator {
-  prompting() {
-    // Have Yeoman greet the user.
-    this.log(
-      yosay(`Welcome to the ${chalk.red("create-lean-jsx-app")} generator!`)
-    );
+const { red } = chalk;
 
-    const prompts = [
-      {
-        type: "input",
-        name: "name",
-        message: "Set a name for your project",
-        default: "myapp"
-      },
-      {
-        type: "input",
-        name: "description",
-        message: "A description for your project",
-        default: "A lean.js-powered web application!"
-      }
-    ];
+export default class extends Generator {
+    prompting() {
+        // Have Yeoman greet the user.
+        this.log(
+            yosay(`Welcome to the ${red("create-lean-jsx-app")} generator!`)
+        );
 
-    return this.prompt(prompts).then(props => {
-      this.props = props;
-    });
-  }
+        const prompts = [
+            {
+                type: "input",
+                name: "name",
+                message: "Set a name for your project",
+                default: "myapp"
+            },
+            {
+                type: "input",
+                name: "description",
+                message: "A description for your project",
+                default: "A lean.js-powered web application!"
+            }
+        ];
 
-  writing() {
-    const src = this.sourceRoot();
-    const dest = this.destinationPath(`${this.props.name}`);
+        return this.prompt(prompts).then(props => {
+            this.props = props;
+        });
+    }
 
-    //The ignore array is used to ignore files, push file names into this array that you want to ignore.
-    const copyOpts = {
-      globOptions: {
-        ignore: []
-      }
-    };
+    writing() {
+        const src = this.sourceRoot();
+        const dest = this.destinationPath(`${this.props.name}`);
 
-    this.fs.copy(src, dest, copyOpts);
-    this.fs.copy(
-      this.templatePath(".build/*"),
-      this.destinationPath(`${this.props.name}/.build`)
-    );
-    this.fs.copy(
-      this.templatePath(".*"),
-      this.destinationPath(`${this.props.name}`)
-    );
+        //The ignore array is used to ignore files, push file names into this array that you want to ignore.
+        const copyOpts = {
+            globOptions: {
+                ignore: []
+            }
+        };
 
-    const files = ["package.json", "src/index.html"];
+        this.fs.copy(src, dest, copyOpts);
+        this.fs.copy(
+            this.templatePath(".build/*"),
+            this.destinationPath(`${this.props.name}/.build`)
+        );
+        this.fs.copy(
+            this.templatePath(".*"),
+            this.destinationPath(`${this.props.name}`)
+        );
 
-    const opts = {
-      name: this.props.name,
-      description: this.props.description
-    };
+        const files = ["package.json", "src/index.html"];
 
-    files.forEach(file => {
-      this.fs.copyTpl(
-        this.templatePath(file),
-        this.destinationPath(`${this.props.name}/${file}`),
-        opts,
-        copyOpts
-      );
-    });
-  }
+        const opts = {
+            name: this.props.name,
+            description: this.props.description
+        };
 
-  install() {
-    const appDir = path.join(process.cwd(), this.props.name);
-    process.chdir(appDir);
-    this.spawnCommandSync("npm", ["link", "lean-jsx"]);
-    this.npmInstall();
-  }
+        files.forEach(file => {
+            this.fs.copyTpl(
+                this.templatePath(file),
+                this.destinationPath(`${this.props.name}/${file}`),
+                opts,
+                copyOpts
+            );
+        });
+    }
 
-  end() {
-    this.spawnCommandSync("git", ["init", "-b", "main"]);
-  }
-};
+    install() {
+        const appDir = join(process.cwd(), this.props.name);
+        process.chdir(appDir);
+        this.spawnCommandSync("npm", ["link", "lean-jsx"]);
+        this.npmInstall();
+    }
+
+    end() {
+        this.spawnCommandSync("git", ["init", "-b", "main"]);
+    }
+}
