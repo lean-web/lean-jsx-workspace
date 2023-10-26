@@ -2,3 +2,9 @@
 	path = packages/eslint-plugin-lean-jsx
 	url = https://github.com/lean-web/eslint-plugin-lean-jsx
 	branch = main
+
+
+[submodule "packages/generator-create-lean-jsx-app"]
+	path = packages/generator-create-lean-jsx-app
+	url = https://github.com/lean-web/create-lean-jsx-app
+	branch = main
