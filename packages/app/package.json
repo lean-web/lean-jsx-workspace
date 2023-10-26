@@ -1,6 +1,7 @@
 {
     "name": "app",
     "version": "1.0.0",
+    "private": true,
     "description": "A sample application to showcase lean.jsx capabilities",
     "main": "index.js",
     "type": "module",
