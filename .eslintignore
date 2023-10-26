@@ -1,7 +1,8 @@
 **/*.js
 **/**/jest.config.js
 dist
-globaal.d.ts
+global.d.ts
 types/*.d.ts
 watch.cjs
 build.cjs
+babel.config.cjs

@@ -1,23 +1,26 @@
 {
-    "name": "sxl",
-    "workspaces": [
-        "packages/core",
-        "packages/app",
-        "packages/generator-create-lean-jsx-app",
-        "packages/eslint-plugin-lean-jsx"
-    ],
-    "scripts": {
-        "prepare": "husky install .config/husky",
-        "submodules": "git submodule update --init --recursive",
-        "update-submodules": "git submodule update --remote"
-    },
-    "devDependencies": {
-        "@types/node": "^20.8.3",
-        "@types/uuid": "^9.0.5",
-        "@typescript-eslint/eslint-plugin": "^6.7.4",
-        "@typescript-eslint/parser": "^6.7.4",
-        "eslint": "^8.51.0",
-        "husky": "^8.0.3",
-        "typescript": "^5.1.3"
-    }
+  "name": "sxl",
+  "workspaces": [
+    "packages/core",
+    "packages/app",
+    "packages/generator-create-lean-jsx-app",
+    "packages/eslint-plugin-lean-jsx"
+  ],
+  "scripts": {
+    "prepare": "husky install .config/husky",
+    "submodules": "git submodule update --init --recursive && npm install",
+    "update-submodules": "git submodule update --remote"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.3",
+    "@types/uuid": "^9.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.51.0",
+    "husky": "^8.0.3",
+    "lerna": "^7.4.1",
+    "typescript": "^5.1.3",
+    "yeoman-test": "^8.2.0"
+  },
+  "dependencies": {}
 }
