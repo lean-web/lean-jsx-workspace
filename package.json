@@ -7,7 +7,9 @@
         "packages/eslint-plugin-lean-jsx"
     ],
     "scripts": {
-        "prepare": "husky install .config/husky"
+        "prepare": "husky install .config/husky",
+        "submodules": "git submodule update --init --recursive",
+        "update-submodules": "git submodule update --remote"
     },
     "devDependencies": {
         "@types/node": "^20.8.3",
