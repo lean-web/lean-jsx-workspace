@@ -1,3 +1,8 @@
+[submodule "packages/core"]
+	path = packages/core
+	url = https://github.com/lean-web/lean-jsx
+	branch = main
+
 [submodule "packages/eslint-plugin-lean-jsx"]
 	path = packages/eslint-plugin-lean-jsx
 	url = https://github.com/lean-web/eslint-plugin-lean-jsx
