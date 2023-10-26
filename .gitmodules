@@ -1,3 +1,4 @@
-[submodule "DbConnector"]
+[submodule "packages/eslint-plugin-lean-jsx"]
 	path = packages/eslint-plugin-lean-jsx
 	url = https://github.com/lean-web/eslint-plugin-lean-jsx
+	branch = main
