@@ -1,0 +1,19 @@
+name: Node.js Package
+
+on:
+  push:
+    branches:
+      - master  # Trigger the workflow on push to master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'  # Set the version of Node.js
+
+      - run: npm ci  # Install dependencies at the root
+      - run: npm ci --prefix packages/your-package  # Install dependencies in the package directory
+      - run: npm test --prefix packages/your-package  # Run tests in the package directory
