@@ -3,14 +3,15 @@ import Generator from "yeoman-generator";
 import chalk from "chalk";
 import yosay from "yosay";
 import { join } from "path";
+// import install from "yeoman-generator/lib/actions/install";
 
-const { red } = chalk;
+const { blue } = chalk;
 
 export default class extends Generator {
-    prompting() {
+    async prompting() {
         // Have Yeoman greet the user.
         this.log(
-            yosay(`Welcome to the ${red("create-lean-jsx-app")} generator!`)
+            yosay(`Welcome to the ${blue("create-lean-jsx-app")} generator!`)
         );
 
         const prompts = [
@@ -28,9 +29,8 @@ export default class extends Generator {
             }
         ];
 
-        return this.prompt(prompts).then(props => {
-            this.props = props;
-        });
+        const props = await this.prompt(prompts);
+        this.props = props;
     }
 
     writing() {
@@ -71,14 +71,5 @@ export default class extends Generator {
         });
     }
 
-    install() {
-        const appDir = join(process.cwd(), this.props.name);
-        process.chdir(appDir);
-        this.spawnCommandSync("npm", ["link", "lean-jsx"]);
-        this.npmInstall();
-    }
-
-    end() {
-        this.spawnCommandSync("git", ["init", "-b", "main"]);
-    }
+    install() {}
 }

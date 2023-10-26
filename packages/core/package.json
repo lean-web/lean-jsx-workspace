@@ -1,13 +1,13 @@
 {
     "name": "lean-jsx",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "Pedro Marquez-Soto",
     "license": "MPL-2.0",
     "description": "Lean-JSX is a server-driven web framework that allows you to build HTML components using JSX-like syntax, but without relying on hefty client-side JavaScript libraries or frameworks.",
     "main": "index.js",
     "types": "./src/types/global.d.ts",
     "files": [
-        "dist",
+        "lib",
         "./src/types"
     ],
     "scripts": {

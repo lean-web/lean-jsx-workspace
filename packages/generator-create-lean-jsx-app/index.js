@@ -1,7 +1,7 @@
+#!/usr/bin/env node
 import { createEnv } from "yeoman-environment";
 const env = createEnv();
 
-// env.register(import("./generators/app/index.js"), "lean-jsx");
 env.lookup();
 
 env.run("create-lean-jsx-app", {}, err => {

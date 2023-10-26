@@ -1,6 +1,6 @@
 {
     "name": "generator-create-lean-jsx-app",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "description": "Generate lean-jsx based web applications",
     "homepage": "",
     "type": "module",
@@ -44,6 +44,7 @@
         "glob": "^10.3.10",
         "yeoman-environment": "^4.0.0",
         "yeoman-generator": "^7.0.0",
+        "yo": "^4.3.1",
         "yosay": "^2.0.2"
     },
     "jest": {
