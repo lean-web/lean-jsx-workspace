@@ -6,3 +6,4 @@ types/*.d.ts
 watch.cjs
 build.cjs
 babel.config.cjs
+packages/core/lib

@@ -23,6 +23,7 @@
         "@types/compression": "^1.7.3",
         "esbuild": "^0.19.4",
         "nodemon": "^3.0.1",
+        "prettier": "^3.0.3",
         "vite-plugin-compression": "^0.5.1",
         "vite-svg-loader": "^4.0.0"
     }

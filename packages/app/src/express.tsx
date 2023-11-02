@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import path from "path";
 import express from "express";
-// import { renderWithTemplate, sxlMiddleware } from "lean-jsx/lib/server";
 import LeanApp from "./engine";
 import bodyParser from "body-parser";
 import { Home } from "./home/home";
@@ -35,7 +34,7 @@ const CSP = `default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 
  */
 function createServer() {
     const logger = LeanApp.logger({
-        defaultLogLevel: "info"
+        defaultLogLevel: "info",
     });
     const app = express();
 
@@ -43,8 +42,8 @@ function createServer() {
 
     app.use(
         compression({
-            filter: shouldCompress
-        })
+            filter: shouldCompress,
+        }),
     );
 
     app.use(
@@ -52,8 +51,8 @@ function createServer() {
         express.static(PUBLIC_PATH, {
             index: false,
             maxAge: "30d",
-            dotfiles: "ignore"
-        })
+            dotfiles: "ignore",
+        }),
     );
 
     app.use(
@@ -61,10 +60,10 @@ function createServer() {
             defaultLogLevel: "info",
             file: {
                 error: {
-                    destination: path.resolve(__dirname, "logs", "error.json")
-                }
-            }
-        })
+                    destination: path.resolve(__dirname, "logs", "error.json"),
+                },
+            },
+        }),
     );
 
     // Configure the lean.jsx middleware:
@@ -77,9 +76,9 @@ function createServer() {
              *  the page content to the browser.
              * @returns  - the configured response
              */
-            configResponse: resp => resp.set("Content-Security-Policy", CSP),
-            globalContextParser: args => parseQueryParams(args)
-        })
+            configResponse: (resp) => resp.set("Content-Security-Policy", CSP),
+            globalContextParser: (args) => parseQueryParams(args),
+        }),
     );
 
     // Configure a page for a specific product
@@ -94,9 +93,9 @@ function createServer() {
             <ProductDescription productId={productId} />,
             globalContext,
             {
-                templateName: "index"
+                templateName: "index",
             },
-            next
+            next,
         );
     });
 
@@ -111,8 +110,8 @@ function createServer() {
             <Home />,
             globalContext,
             {
-                templateName: "index"
-            }
+                templateName: "index",
+            },
         );
     });
 

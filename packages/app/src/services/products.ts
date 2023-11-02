@@ -19,7 +19,7 @@ const getReviews = (count: number): Review[] => {
         .map(() => ({
             username: faker.internet.userName(),
             content: faker.lorem.paragraphs(2),
-            created: faker.date.anytime(),
+            created: faker.date.anytime()
         }));
 };
 
@@ -27,11 +27,11 @@ const allProducts: Product[] = new Array(100).fill(true).map((_, index) => ({
     id: `p${index}`,
     name: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
-    reviews: getReviews(15),
+    reviews: getReviews(15)
 }));
 
 async function wait(timeInMillis: number): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         setTimeout(() => {
             resolve();
         }, timeInMillis);
@@ -49,5 +49,5 @@ export async function fetchProducts(
 
 export async function fetchProduct(productId: string) {
     await wait(300);
-    return allProducts.find((p) => p.id === productId);
+    return allProducts.find(p => p.id === productId);
 }
