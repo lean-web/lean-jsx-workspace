@@ -5,6 +5,10 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-type-checked"
     ],
+    env: {
+        browser: true,
+        node: true
+    },
     parser: "@typescript-eslint/parser",
     parserOptions: {
         tsconfigRootDir: __dirname,
@@ -29,6 +33,7 @@ module.exports = {
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/no-unsafe-return": "warn",
         "@typescript-eslint/no-unsafe-call": "warn",
-        "lean-jsx/single-yield-return": "error"
+        "lean-jsx/single-yield-return": "error",
+        "lean-jsx/no-outer-scope-in-handlers": "error"
     }
 };

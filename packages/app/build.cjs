@@ -4,17 +4,17 @@ const packageConfig = require("./package.json");
 
 /**
  * Main build configuration.
- * 
+ *
  * We build the web and server parts independently to better
  * control the configuration of each:
- * 
- * - Web: Bundled with Vite: Allows bundling and processing the 
+ *
+ * - Web: Bundled with Vite: Allows bundling and processing the
  *      index.html main template.
- * - Server: Bundled with esbuild: Bundles all server code into 
+ * - Server: Bundled with esbuild: Bundles all server code into
  *      a CJS file that can be executed by NodeJS.
  *      It allows us to use JSX directly on the server side.
- * 
- * @returns 
+ *
+ * @returns
  */
 module.exports = async () => {
     // root directory for the source code:
