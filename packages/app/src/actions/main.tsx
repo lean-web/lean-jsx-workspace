@@ -1,6 +1,6 @@
 import { Layout } from "@/layout";
 import { GetDynamicComponent, webAction } from "lean-jsx/lib/server/components";
-import { SXLGlobalContext } from "lean-jsx/src/types/context";
+import { SXLGlobalContext } from "lean-jsx/lib/context";
 
 async function getServerDate(): Promise<Date> {
     await Promise.resolve();
