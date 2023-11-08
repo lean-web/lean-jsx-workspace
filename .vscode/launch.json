@@ -8,14 +8,28 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Sample App",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "preLaunchTask": "npm: build - packages/app",
             "program": "${workspaceFolder}/packages/app/dist/express.cjs",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
+            "outFiles": ["${workspaceFolder}/**/*.js"]
+        },
+        {
+            "type": "node",
+            "name": "vscode-jest-tests.v2",
+            "request": "launch",
+            "args": [
+                "--runInBand",
+                "--watchAll=false",
+                "--testNamePattern",
+                "${jest.testNamePattern}",
+                "--runTestsByPath",
+                "${jest.testFile}"
+            ],
+            "cwd": "/Users/pedro/Code/TypeScript/lean-jsx-workspace",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "program": "/Users/pedro/Code/TypeScript/lean-jsx-workspace/node_modules/.bin/jest"
         }
     ]
 }

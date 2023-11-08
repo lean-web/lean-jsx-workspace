@@ -7,7 +7,7 @@
     "type": "module",
     "scripts": {
         "build": "node ./.build/build.cjs",
-        "dev": "node ./.build/watch.cjs"
+        "dev": "NODE_ENV=development node ./.build/watch.cjs"
     },
     "author": "",
     "license": "ISC",

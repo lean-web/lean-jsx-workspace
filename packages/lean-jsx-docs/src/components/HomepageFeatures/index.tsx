@@ -21,7 +21,7 @@ const FeatureList: FeatureItem[] = [
                 components that are rendered once in the server and returned as
                 pure HTML. No React needed.
             </>
-        )
+        ),
     },
     {
         title: "Streamed HTTP responses",
@@ -31,7 +31,7 @@ const FeatureList: FeatureItem[] = [
                 Stream HTML as it's generated from your JSX components for an
                 optimal time-to-first-byte. Powered by NodeJS Express.
             </>
-        )
+        ),
     },
     {
         title: "Minimal bundle size",
@@ -41,8 +41,8 @@ const FeatureList: FeatureItem[] = [
                 Your JavaScript is only for actions. No need to load large
                 bundles just for rendering a page.
             </>
-        )
-    }
+        ),
+    },
 ];
 
 function Feature({ title, Svg, description }: FeatureItem) {

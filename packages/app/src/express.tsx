@@ -5,10 +5,11 @@ import LeanApp from "./engine";
 import bodyParser from "body-parser";
 import { Home } from "./home/home";
 import { ProductDescription } from "./products/product-description";
-import { DynamicProductList } from "./products/product-list";
 import compression from "compression";
 import { parseQueryParams } from "./context";
 import { shouldCompress } from "lean-jsx/lib/server";
+import { ServerDateComponent, MainActionsPage } from "./actions/main";
+import { webAction } from "lean-jsx/lib/server/components";
 
 /**
  * Output path for the bundled assets:
@@ -55,21 +56,20 @@ function createServer() {
         }),
     );
 
-    app.use(
-        LeanApp.expressLogging({
-            defaultLogLevel: "info",
-            file: {
-                error: {
-                    destination: path.resolve(__dirname, "logs", "error.json"),
-                },
-            },
-        }),
-    );
+    // app.use(
+    //     LeanApp.expressLogging({
+    //         defaultLogLevel: "info",
+    //         file: {
+    //             error: {
+    //                 destination: path.resolve(__dirname, "logs", "error.json"),
+    //             },
+    //         },
+    //     }),
+    // );
 
     // Configure the lean.jsx middleware:
     app.use(
         LeanApp.middleware({
-            components: [DynamicProductList],
             /**
              * Set custom response attributes.
              * @param resp - the server response, before streaming
@@ -77,7 +77,18 @@ function createServer() {
              * @returns  - the configured response
              */
             configResponse: (resp) => resp.set("Content-Security-Policy", CSP),
-            globalContextParser: (args) => parseQueryParams(args),
+            globalContextParser: (req, componentName) => {
+                console.log({ componentName });
+                if (componentName === ServerDateComponent.contentId) {
+                    return {
+                        ...parseQueryParams(req),
+                        ...{
+                            mmDDYY: Boolean(req.query?.mmDDYY),
+                        },
+                    };
+                }
+                return parseQueryParams(req);
+            },
         }),
     );
 
@@ -99,18 +110,55 @@ function createServer() {
         );
     });
 
+    app.get("/actions", async (req, res, next) => {
+        const globalContext = parseQueryParams(req);
+
+        await LeanApp.render(
+            res.set("Content-Security-Policy", CSP),
+            <MainActionsPage />,
+            {
+                globalContext,
+                templateName: "index",
+            },
+            next,
+        );
+    });
+
+    app.get("/about", async (req, res) => {
+        type UserContext = { user: { firstName: string } };
+
+        function MyComponent(this: UserContext) {
+            const user = { firstName: "John" };
+            return (
+                <button
+                    onclick={webAction(user, (ev, webContext) => {
+                        alert(`Hello ${webContext?.data.firstName}`);
+                    })}
+                >
+                    Click to greet user
+                </button>
+            );
+        }
+
+        await LeanApp.render(
+            res.set("Content-Security-Policy", CSP),
+            <main>
+                <h1>About</h1>
+                <p>This is a simple page</p>
+                <MyComponent />
+            </main>,
+        );
+    });
+
     // configure the main page:
     app.use("/", async (req, res) => {
         const globalContext = parseQueryParams(req);
 
-        await LeanApp.renderWithTemplate(
-            res
-                .set("Content-Security-Policy", CSP)
-                .set("Transfer-Encoding", "chunked"),
-            <Home />,
-            globalContext,
+        await LeanApp.render(
+            res.set("Content-Security-Policy", CSP),
+            <Home arg2="This is an arg" />,
             {
-                templateName: "index",
+                globalContext,
             },
         );
     });

@@ -1,0 +1,113 @@
+:root {
+    --nav-background-color: black;
+    --nav-item-background-color: #262626;
+    --nav-item-background-color-light: #444444;
+}
+
+nav {
+    padding: 1em;
+    margin: 0;
+    background-color: black;
+    color: white;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+nav .section {
+    background-color: var(--nav-item-background-color);
+    border: 1px solid black;
+    margin: 0 0.2em;
+    padding: 0.5em;
+    color: white;
+}
+
+nav .section {
+    position: relative;
+    min-width: 100px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: stretch;
+    cursor: pointer;
+
+    border-radius: 0.2rem;
+    box-shadow: 2px 4px 4px 3px #43434354;
+}
+
+nav .section:hover {
+    background-color: var(--nav-item-background-color-light);
+}
+
+nav .section[open] {
+    background-color: var(--nav-item-background-color);
+
+    & ul {
+        background-color: var(--nav-item-background-color);
+    }
+}
+
+nav .section ul {
+    list-style: none;
+    padding: 0;
+    background-color: var(--nav-item-background-color);
+    margin: 0;
+    border-radius: 0.2rem;
+    box-shadow: 2px 4px 4px 3px #43434354;
+    border: 1px solid black;
+}
+
+nav .section ul {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    top: 2.2em;
+    width: 100%;
+    z-index: 2;
+
+    & li {
+        padding: 0.2em;
+        text-align: start;
+
+        & a {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-content: center;
+            flex-grow: 1;
+            min-height: 2em;
+            color: white;
+            text-decoration: none;
+            padding: 0.2em;
+        }
+
+        & a:hover {
+            background-color: var(--nav-item-background-color-light);
+        }
+    }
+}
+
+.nav-hidden {
+    display: none;
+}
+
+@media only screen and (max-width: 600px) {
+    nav {
+        display: grid;
+        grid-auto-columns: auto;
+    }
+
+    nav .section ul {
+        position: relative;
+        top: 0;
+    }
+
+    nav .section ul li a {
+        justify-content: start;
+        padding-left: 1em;
+    }
+}

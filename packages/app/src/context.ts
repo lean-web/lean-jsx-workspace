@@ -14,6 +14,6 @@ export function parseQueryParams(req: Request): RequestQueryParams {
     return {
         jsDisabled: Boolean(req.query?.jsDisabled),
         withLoadingState: Boolean(req.query?.withLoadingState),
-        dynamicProductList: Boolean(req.query?.dynamicProductList)
+        dynamicProductList: Boolean(req.query?.dynamicProductList),
     };
 }

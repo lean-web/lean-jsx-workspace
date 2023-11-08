@@ -67,17 +67,7 @@ function App() {
 }
 ```
 
-And one blocking, API-oriented handler for the server to expose as an endpoint:
-
-```js
-// using LeanJSX middleware:
-app.use(
-    LeanEngine.middleware({
-        components: [JsComponent],
-        globalContextParser: () => ({})
-    })
-);
-```
+And one blocking, API-oriented handler for the server to expose as an endpoint. This handler is automatically stored by `GetDynamicComponent` in an internal registry of dynamic components.
 
 These two handlers in conjunction, perform the following actions:
 

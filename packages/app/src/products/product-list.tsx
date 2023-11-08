@@ -2,12 +2,12 @@ import { RequestQueryParams } from "../context";
 import { fetchProducts, Product } from "../services/products";
 import {
     GetDynamicComponent,
-    toQueryString
+    toQueryString,
 } from "lean-jsx/lib/server/components";
 
 export function ProductListDetails({
     product,
-    globalContext
+    globalContext,
 }: { product: Product } & { globalContext?: RequestQueryParams }) {
     return (
         <a
@@ -30,14 +30,14 @@ export function ProductListDetails({
  * @returns
  */
 export async function ProductList({
-    start
+    start,
 }: { start: number } & { globalContext?: RequestQueryParams }) {
     const products = await fetchProducts(start, 10, 3000);
     return (
         <div>
             <h2>Products</h2>
             <ul className="product-list">
-                {products.map(product => (
+                {products.map((product) => (
                     <li>
                         <ProductListDetails product={product} />
                     </li>
@@ -76,14 +76,14 @@ export function ProductListLoading() {
 export const DynamicProductList = GetDynamicComponent(
     "product-list",
     () => fetchProducts(0, 10, 3000),
-    maybeResource => {
+    (maybeResource) => {
         if (maybeResource.isResolved) {
             const products = maybeResource.value;
             return (
                 <div>
                     <h2>Products</h2>
                     <ul className="product-list">
-                        {products.map(product => (
+                        {products.map((product) => (
                             <li>
                                 <ProductListDetails product={product} />
                             </li>

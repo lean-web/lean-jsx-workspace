@@ -24,7 +24,7 @@ async function ProductDetails({ productId }: { productId: string }) {
 
 export function ProductDescription({
     productIndexStart,
-    productId
+    productId,
 }: {
     productIndexStart?: number;
     productId: string;

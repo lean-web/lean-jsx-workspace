@@ -1,15 +1,15 @@
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx-cloud",
-      "options": {
-        "cacheableOperations": [],
-        "accessToken": "YTZhZTE1N2MtM2ViNC00Y2E2LThiZmYtYjEyM2ZmNzdhYmYxfHJlYWQtd3JpdGU="
-      }
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "nx-cloud",
+            "options": {
+                "cacheableOperations": [],
+                "accessToken": "YTZhZTE1N2MtM2ViNC00Y2E2LThiZmYtYjEyM2ZmNzdhYmYxfHJlYWQtd3JpdGU="
+            }
+        }
+    },
+    "targetDefaults": {},
+    "affected": {
+        "defaultBase": "main"
     }
-  },
-  "targetDefaults": {},
-  "affected": {
-    "defaultBase": "main"
-  }
 }

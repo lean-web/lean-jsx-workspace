@@ -29,13 +29,13 @@ module.exports = async () => {
     // extension map for the bundling of server resources:
     // it uses CommonJS by default for execution in NodeJS.
     const outExtension = {
-        ".js": ".cjs"
+        ".js": ".cjs",
     };
 
     const bundledOutExtensionMap = {
         ".tsx": outExtension[".js"],
         ".ts": outExtension[".js"],
-        ".js": outExtension[".js"]
+        ".js": outExtension[".js"],
     };
 
     /**  @type {import("lean-jsx/src/types/build").default} */
@@ -47,9 +47,9 @@ module.exports = async () => {
             build: {
                 outDir,
                 assetsDir: "assets",
-                emptyOutDir: true
+                emptyOutDir: true,
             },
-            plugins: [injectScript("lean-jsx")]
+            plugins: [injectScript("lean-jsx")],
         },
         // The configuration for the server part:
         server: {
@@ -72,10 +72,10 @@ module.exports = async () => {
                 outExtension,
                 loader: {
                     ".png": "dataurl",
-                    ".svg": "text"
-                }
-            }
-        }
+                    ".svg": "text",
+                },
+            },
+        },
     };
     return conf;
 };

@@ -29,61 +29,61 @@ const config = {
     // to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: "en",
-        locales: ["en"]
+        locales: ["en"],
     },
 
     presets: [
         [
             "classic",
             /** @type {import('@docusaurus/preset-classic').Options} */
-            ({
+            {
                 docs: {
-                    sidebarPath: require.resolve("./sidebars.js")
+                    sidebarPath: require.resolve("./sidebars.js"),
                     // editUrl:
                     //     "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/"
                 },
                 blog: {
-                    showReadingTime: true
+                    showReadingTime: true,
                     // editUrl:
                     //     "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/"
                 },
                 theme: {
-                    customCss: require.resolve("./src/css/custom.css")
-                }
-            })
-        ]
+                    customCss: require.resolve("./src/css/custom.css"),
+                },
+            },
+        ],
     ],
 
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-        ({
+        {
             // Replace with your project's social card
             image: "img/logo.svg",
             navbar: {
                 title: "lean-jsx",
                 logo: {
                     alt: "My Site Logo",
-                    src: "img/logo.svg"
+                    src: "img/logo.svg",
                 },
                 items: [
                     {
                         type: "docSidebar",
                         sidebarId: "tutorialSidebar",
                         position: "left",
-                        label: "Docs"
+                        label: "Docs",
                     },
                     { to: "/blog", label: "Blog", position: "left" },
                     {
                         to: "/docs/about",
                         label: "Mainteners",
-                        position: "left"
+                        position: "left",
                     },
                     {
                         href: "https://github.com/lean-web/lean-jsx",
                         label: "GitHub",
-                        position: "right"
-                    }
-                ]
+                        position: "right",
+                    },
+                ],
             },
             footer: {
                 style: "dark",
@@ -93,9 +93,9 @@ const config = {
                         items: [
                             {
                                 label: "Tutorial",
-                                to: "/docs/intro"
-                            }
-                        ]
+                                to: "/docs/intro",
+                            },
+                        ],
                     },
                     // {
                     //     title: "Community",
@@ -120,20 +120,20 @@ const config = {
                         items: [
                             {
                                 label: "Blog",
-                                to: "/blog"
+                                to: "/blog",
                             },
                             {
                                 label: "GitHub",
-                                href: "https://github.com/lean-web/lean-jsx"
-                            }
-                        ]
-                    }
+                                href: "https://github.com/lean-web/lean-jsx",
+                            },
+                        ],
+                    },
                 ],
-                copyright: `Copyright © ${new Date().getFullYear()} LeanJSX. Documentation built with Docusaurus.`
+                copyright: `Copyright © ${new Date().getFullYear()} LeanJSX. Documentation built with Docusaurus.`,
             },
             prism: {
                 theme: lightCodeTheme,
-                darkTheme: darkCodeTheme
+                darkTheme: darkCodeTheme,
             },
             announcementBar: {
                 id: "alpha",
@@ -141,12 +141,12 @@ const config = {
                     'LeanJSX is currently on Alpha release. Please read <a href="/blog/alpha-is-out">our first blog post</a> before using it in production.',
                 backgroundColor: "#b66d00",
                 textColor: "#fff",
-                isCloseable: false
+                isCloseable: false,
             },
             colorMode: {
-                defaultMode: "dark"
-            }
-        })
+                defaultMode: "dark",
+            },
+        },
 };
 
 module.exports = config;

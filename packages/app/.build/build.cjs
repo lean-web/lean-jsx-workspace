@@ -1,6 +1,6 @@
 const { build } = require("esbuild");
 const { build: viteBuild } = require("vite");
-const getConfig = require("../build.cjs")
+const getConfig = require("../build.cjs");
 
 /**
  * Build the web and server parts separately:

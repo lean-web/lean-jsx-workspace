@@ -9,18 +9,18 @@ module.exports = {
             testEnvironment: "node",
             moduleNameMapper: {
                 "^@tests/(.*)$": "<rootDir>/packages/core/tests/$1",
-                "^@/(.*)$": "<rootDir>/packages/core/src/$1"
+                "^@/(.*)$": "<rootDir>/packages/core/src/$1",
             },
             transform: {
                 "^.+\\.tsx?$": [
                     "ts-jest",
-                    { tsconfig: "<rootDir>/packages/core/tsconfig.json" }
-                ]
+                    { tsconfig: "<rootDir>/packages/core/tsconfig.json" },
+                ],
             },
             testMatch: [
                 "<rootDir>/packages/core/tests/e2e/**/*.test.ts",
-                "<rootDir>/packages/core/tests/e2e/**/*.test.tsx"
-            ]
-        }
-    ]
+                "<rootDir>/packages/core/tests/e2e/**/*.test.tsx",
+            ],
+        },
+    ],
 };

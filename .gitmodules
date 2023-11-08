@@ -9,7 +9,7 @@
 	branch = main
 
 
-[submodule "packages/generator-create-lean-jsx-app"]
-	path = packages/generator-create-lean-jsx-app
+[submodule "packages/create-lean-jsx-app"]
+	path = packages/create-lean-jsx-app
 	url = https://github.com/lean-web/create-lean-jsx-app
 	branch = main

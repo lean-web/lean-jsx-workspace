@@ -3,16 +3,20 @@ module.exports = {
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-type-checked"
+        "plugin:@typescript-eslint/recommended-type-checked",
     ],
+    root: true,
     env: {
         browser: true,
-        node: true
+        node: true,
     },
     parser: "@typescript-eslint/parser",
     parserOptions: {
         tsconfigRootDir: __dirname,
-        project: ["./packages/*/tsconfig.json"]
+        project: [
+            "./packages/core/tsconfig.json",
+            "./packages/app/tsconfig.json",
+        ],
     },
     plugins: ["@typescript-eslint", "eslint-plugin-lean-jsx"],
     root: true,
@@ -24,8 +28,8 @@ module.exports = {
             {
                 ignoreRestSiblings: true,
                 varsIgnorePattern: "_",
-                argsIgnorePattern: "_"
-            }
+                argsIgnorePattern: "_",
+            },
         ],
         "@typescript-eslint/ban-types": "warn",
         "@typescript-eslint/no-namespace": "warn",
@@ -34,6 +38,6 @@ module.exports = {
         "@typescript-eslint/no-unsafe-return": "warn",
         "@typescript-eslint/no-unsafe-call": "warn",
         "lean-jsx/single-yield-return": "error",
-        "lean-jsx/no-outer-scope-in-handlers": "error"
-    }
+        "lean-jsx/no-outer-scope-in-handlers": "error",
+    },
 };

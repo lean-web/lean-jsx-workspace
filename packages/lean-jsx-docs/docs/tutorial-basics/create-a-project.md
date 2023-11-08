@@ -6,17 +6,17 @@ sidebar_position: 1
 
 ## Create a new project
 
-The easiest way to use LeanJSX is to create a new project using our our Yeoman-based generator:
+The easiest way to use LeanJSX is to create a new project using our project generator:
 
 ```
-npx generator-lean-jsx@latest
+npx create-lean-jsx-app@latest <dir>
 ```
 
-This will take you to a short step-by-step wizard to create a new project.
+This will take you to a short step-by-step wizard to create a new project. The generator will execute `npm install` automatically.
 
-![Command line displaying the creation of a new project](./generate-app.gif)
+## Start the server
 
-To start the server, run `npm install` and run the following commands:
+To start the server, navigate to the directory created by the project generator (the directory name used in `<dir>`) and execute:
 
 ```
 npm run dev

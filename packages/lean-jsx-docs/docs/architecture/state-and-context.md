@@ -74,7 +74,7 @@ The only time LeanJSX returns non-HTML data to the client is when using **event 
 LeanJSX components support adding event handlers directly to HTML content:
 
 ```jsx
-funcion MyComponent() {
+function MyComponent() {
     return <button onclick={() => alert(`Hello John`)}>
             Click to greet user
         </button>
@@ -85,26 +85,22 @@ First, notice that `onclick` follows the same syntax as native HTML elements (no
 
 Second, event handlers are client-rendered by default. There is no way to make these work without sending the contents of the handler attribute back to the client.
 
-Second, event handlers have access to the function's local scope, which means that they need access to this data *in the browser*.
-
 For the component above, LeanJSX will stream the following HTML content:
 
 ```html
-<button data-action="element-0">Click to greet user</button>
-<script>
-    (function(){
-    document.querySelector('[data-action="element-0"]').addEventListener('click', () => alert(`Hello John`))
-    }).call({"props":{"dataset":{},"globalContext":{}}})
+<button data-action="element-3">Click to greet user</button>
+<script type="application/javascript">
+    document.querySelector('[data-action="element-3"]')
+        .addEventListener('click', () => alert(`Hello John`));
 </script>
 ```
 
 - If an event handler is defined in a component(e.g. `onclick`), LeanJSX will automatically attach an event listener for the element in an inline script element which will be rendered immediately after the component is rendered.
-- Properties passed to the component are marshaled into a JSON string, and passed as `this` to the IIFE created by LeanJSX.
-- The `globalContext` (more details on this next) is also added to the handler scope.
+- Only variables defined in the scope of the event handler will be sent to the client. Any reference to other variables will result in an `undefined` variable.
 
 Now, when a user clicks on the button -even before the rest of the page finishes loading-, the event handler will execute correctly.
 
-What if the event handler needs access to data defined *inside* the function? In this case, we can add attributes to the *scope* of the function itself: `this`:
+What if the event handler needs access to data defined _outside_ the event handler's scope? In this case, we can add attributes to the *scope* of the function component: `this`:
 
 ```tsx
 type UserContext = { user: { firstName: string } };
@@ -122,20 +118,68 @@ function Home(this: UserContext) {
 This component will be rendered as follows:
 
 ```html
-<button data-action="element-0">Click to greet user</button>
-<script>
+<button data-action="element-3">Click to greet user</button>
+<script type="application/javascript">
     (function(){
-    document.querySelector('[data-action="element-0"]').addEventListener('click', () => alert(this.user.firstName))
-    }).call({
-        "props":{"dataset":{},"globalContext":{}},
-        "user":{"firstName":"John"}
-    })
+        document.querySelector('[data-action="element-3"]')
+            .addEventListener('click', () => alert(this.user.firstName));
+    }).call({"user":{"firstName":"John"}});
 </script>
 ```
 
 By allowing developers to set content into the component's function `this` scope, we allow them to choose what data they want to expose to the client, preserving sensitive data on the server's scope.
 
-> Notice that the props are by default passed to the client. Any sensitive data passed as a prop will also be exposed. Developers must be careful with the data that is passed as a prop. In future releases, we will provde a way to indicate which props should be exposed to the browser.
+## The webAction helper
+
+An alternative to setting values to the component's scope is to use the `webAction` helper:
+
+
+
+```jsx
+import { webAction } from "lean-jsx/lib/server/components";
+
+function MyComponent(this: UserContext) {
+    const user = { firstName: "John" };
+    return (
+        <button
+            onclick={webAction(user, (ev, webContext) => {
+                alert(`Hello ${webContext?.data.firstName}`);
+            })}
+        >
+            Click to greet user
+        </button>
+    );
+}
+```
+
+Data that needs to be serialized to the browser must be passed as the first parameter to `webAction`.
+
+The second parameter is the handler function, which receives the `Event` object for the handler in addition to a second parameter `webContext`. This object has a `data` attribute, which contains the data passed as the first parameter of `webAction`.
+
+This component would be rendered to as follows:
+
+
+```html
+<button data-action="element-3">Click to greet user</button>
+<script type="application/javascript">
+    document.querySelector('[data-action="element-3"]')
+        .addEventListener('click', (ev) => {
+        const h = (ev, webContext) => {
+            alert(`Hello ${webContext?.data.firstName}`);
+        };
+        h(ev, {
+            data: {"firstName":"John"},
+            // ... other web context props
+        });
+    });
+</script>
+```
+
+Why can't we just pass the variable into the event handler?
+
+Unlike React components, LeanJSX makes a very hard distinction between server/browser boundaries: **All content is server-based, unless explicitely configured otherwise**.
+
+By explicitely defining which data will be sent to the browser, we reduce the chance of leaking sensitive information or causing confusion about where rendering is actually happening (the server).
 
 ## Global context
 

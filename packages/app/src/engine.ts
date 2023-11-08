@@ -7,12 +7,12 @@ const app = buildApp({
     templates: {
         index: {
             path: INDEX_HTML_PATH,
-            contentPlaceholder: "<!--EAGER_CONTENT-->"
-        }
+            contentPlaceholder: "<!--EAGER_CONTENT-->",
+        },
     },
     logging: {
-        defaultLogLevel: "info"
-    }
+        defaultLogLevel: "info",
+    },
 });
 
 export default app;

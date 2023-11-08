@@ -1,9 +1,10 @@
 **/*.js
 **/**/jest.config.js
 dist
-global.d.ts
 types/*.d.ts
 watch.cjs
 build.cjs
 babel.config.cjs
 packages/core/lib
+packages/create-lean-jsx-app
+packages/lean-jsx-docs

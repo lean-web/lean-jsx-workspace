@@ -1,0 +1,86 @@
+<body>
+    <div id="el"></div>
+
+    <button id="click1" type="button">
+        Emit1
+    </button>
+
+    <button id="click2" type="button">
+        Emit2
+    </button>
+
+    <my-custom-element id="cmp1" size="100">a</my-custom-element>
+    <my-custom-element id="cmp2" size="100">b</my-custom-element>
+</body>
+
+<script>
+    
+
+    function refetchElement(id, queryParams) {
+        const event = new CustomEvent("build", { detail: {id, queryParams} });
+        document.dispatchEvent(event);
+    }
+
+    function fetchData() {
+        return `Some data: ${new Date()}`;
+    }
+
+    class MyCustomElement extends HTMLElement {
+        static observedAttributes = ["size"];
+
+        constructor() {
+            super();
+            this.queryParams = { someArg: true };
+            this.domParser = new DOMParser();
+        }
+
+        onReload = {
+                handleEvent: async (e) => {
+                if (e.detail.id === this.getAttribute('id')) {
+                    console.log(e.detail.queryParams)
+                    const newData = fetchData()
+                    const responseDOM = this.domParser.parseFromString(
+                        `<p>${newData}!</p>`,
+                        "text/html"
+                    );
+                    const fragment = responseDOM.createDocumentFragment();
+                    Array.from(responseDOM.body.children).forEach(child => {
+                        fragment.appendChild(child);
+                    });
+                    if (this.childNodes.length === 0) {
+                        this.appendChild(fragment);
+                    } else {
+                        this.replaceChild(fragment, this.childNodes[0]);
+                    }
+                } else {
+                    console.log(`Not this: ${this.getAttribute('id')}`)
+                }
+            }
+        }
+
+        connectedCallback() {
+            console.log("Custom element added to page.");
+            document.addEventListener("build", this.onReload, false);
+        }
+
+        disconnectedCallback() {
+            console.log("Custom element removed from page.");
+            document.removeEventListener("build", this.onReload, false);
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            console.log(
+                `Attribute ${name} has changed from ${oldValue} to ${newValue}.`
+            );
+        }
+    }
+
+    customElements.define("my-custom-element", MyCustomElement);
+
+    document.querySelector("#click1").addEventListener("click", () => {
+        refetchElement('cmp1', {hide:true})
+    });
+    document.querySelector("#click2").addEventListener("click", () => {
+        refetchElement('cmp2', {hide:true})
+    });
+</script>

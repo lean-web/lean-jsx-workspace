@@ -4,14 +4,14 @@ import { SXLGlobalContext } from "lean-jsx/src/types/context";
 import {
     DynamicProductList,
     ProductList,
-    ProductListLoading
+    ProductListLoading,
 } from "./products/product-list";
 
 import { Nav } from "./components/nav";
 
 function ProductListWrapper({
     productListStart,
-    globalContext
+    globalContext,
 }: {
     productListStart?: number;
     globalContext?: SXLGlobalContext;
@@ -34,16 +34,21 @@ function ProductListWrapper({
 
 export function Layout({
     productListStart,
-    children
-}: SXL.Props & { productListStart?: number } & {
+    asideContent,
+    children,
+}: SXL.Props & { productListStart?: number; asideContent?: JSX.Element } & {
     globalContext?: SXLGlobalContext;
 }) {
     return (
         <div className="page">
             <Nav />
+
             <aside>
-                <ProductListWrapper productListStart={productListStart} />
+                {asideContent || (
+                    <ProductListWrapper productListStart={productListStart} />
+                )}
             </aside>
+
             <main>{children}</main>
         </div>
     );

@@ -1,48 +1,55 @@
+@import url("./css/nav.css");
+
 body {
     margin: 0.5em;
     background-color: black;
     color: white;
-  }
-  
-  main > * {
-    padding: 1em;
-  }
+}
 
-  main > h1 {
-    padding-top:0;
-    margin-top:2rem;
-  }
-  
-  .costly {
+main > * {
+    padding: 1em;
+}
+
+main > h1 {
+    padding-top: 0;
+    margin-top: 2rem;
+}
+
+.costly {
     background-color: red;
-  }
-  
-  dynamic-component {
+}
+
+dynamic-component {
     display: contents;
-  }
-  
-  /***** PAGE ****/
-  
-  :root {
+}
+
+/***** PAGE ****/
+
+:root {
     --nav-height: 50px;
     --aside-width: 200px;
     --product-background-color: #363636;
     --product-background-color--hover: #484848;
-  }
-  
-  body {
+}
+
+body {
     font-family: Arial, Helvetica, sans-serif;
-  }
-  
-  .page {
+}
+
+.page {
     display: grid;
     grid-template-columns: [left] var(--aside-width) [center] calc(
-        100% - var(--aside-width)
-      );
+            100% - var(--aside-width)
+        );
     grid-template-rows: [top] max(var(--nav-height), max-content) [content] 100vh;
-  }
-  
-  nav {
+}
+
+nav {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+}
+
+/* nav {
     grid-column: 1 / span 2;
     grid-row: 1;
     display: flex;
@@ -68,61 +75,60 @@ body {
     & a:visited {
       color: white;
     }
-  }
-  
-  aside {
+  } */
+
+aside {
     grid-column: 1;
     grid-row: 2;
     & h2 {
-        margin-top:2rem;
+        margin-top: 2rem;
     }
-  }
-  
-  main {
+}
+
+main {
     grid-column: 2;
     grid-row: 2;
-  }
-  
-  .product-list {
+}
+
+.product-list {
     list-style-type: none;
     max-height: calc(100vh - var(--nav-height));
     overflow-y: scroll;
     border-left: solid blue;
     border-right: solid blue;
     padding: 0;
-  }
-  
-  .product {
+}
+
+.product {
     & > h3 {
-      margin-top: 1px;
+        margin-top: 1px;
     }
     background-color: var(--product-background-color);
     font-size: 0.9rem;
     padding: 0.2rem;
     margin: 0.2rem;
-  
+
     /* Override link styles */
     display: block;
     cursor: pointer;
     text-decoration: none;
     color: white;
     &:hover {
-      background-color: var(--product-background-color--hover);
+        background-color: var(--product-background-color--hover);
     }
-  }
+}
 
-
-  .loading {
+.loading {
     height: 2em;
     width: 100%;
     position: relative;
     overflow-x: hidden;
-     border-radius: 0.2em;
+    border-radius: 0.2em;
     filter: blur(0.5px);
     will-change: transform;
-  }
-  
-  .loading:before {
+}
+
+.loading:before {
     --gradient-start-color: #453e3e;
     --gradient-end-color: #555454;
     content: " ";
@@ -134,15 +140,19 @@ body {
     display: block;
     position: absolute;
     overflow-x: hidden;
-    background: repeating-linear-gradient(to right, var( --gradient-start-color), var(--gradient-end-color), var( --gradient-start-color) 33.3%);
-  }
-  
-   @keyframes rolling {
-      0% {
-          transform: translateX(-33.3%);
-      }
-      100% {
-          transform: translateX(0);
-      }
+    background: repeating-linear-gradient(
+        to right,
+        var(--gradient-start-color),
+        var(--gradient-end-color),
+        var(--gradient-start-color) 33.3%
+    );
+}
+
+@keyframes rolling {
+    0% {
+        transform: translateX(-33.3%);
     }
-  
+    100% {
+        transform: translateX(0);
+    }
+}

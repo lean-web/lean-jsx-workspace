@@ -12,6 +12,15 @@
         {
             "files": "*.css",
             "options": { "parser": "css" }
+        },
+        {
+            "files": "*.ts",
+            "options": { "parser": "typescript" }
+        },
+        {
+            "files": "*.tsx",
+            "options": { "parser": "typescript" }
         }
+        
     ]
 }

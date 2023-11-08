@@ -6,7 +6,7 @@ module.exports = {
     collectCoverage: true,
     reporters: [
         "default",
-        ["<rootDir>/packages/core/tests/reporters/slow-test", { numTests: 5 }]
+        ["<rootDir>/packages/core/tests/reporters/slow-test", { numTests: 5 }],
     ],
-    projects: ["packages/core"]
+    projects: ["packages/core", "packages/create-lean-jsx-app"],
 };
