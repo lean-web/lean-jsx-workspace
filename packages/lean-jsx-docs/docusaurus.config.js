@@ -138,7 +138,7 @@ const config = {
             announcementBar: {
                 id: "alpha",
                 content:
-                    'LeanJSX is currently on Alpha release. Please read <a href="/blog/alpha-is-out">our first blog post</a> before using it in production.',
+                    'LeanJSX is currently on Alpha release. Please read <a href="/lean-jsx/blog/alpha-is-out">our first blog post</a> before using it in production.',
                 backgroundColor: "#b66d00",
                 textColor: "#fff",
                 isCloseable: false,
