@@ -4,8 +4,10 @@
         "useDefineForClassFields": true,
         "module": "ESNext",
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "experimentalDecorators": true,
         "skipLibCheck": true,
         "outDir": "./dist",
+        "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": true,
         "moduleResolution": "bundler",
@@ -18,6 +20,7 @@
         "noUnusedParameters": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": false,
+        "verbatimModuleSyntax": true,
         "jsx": "react-jsx",
         "jsxImportSource": "lean-jsx/lib/jsx",
         "paths": {
@@ -32,7 +35,7 @@
         "factories",
         "sxl.d.ts",
         "src",
-        "build.cjs",
-        ".build/plugin.cjs"
+        "build.js",
+        ".eslint.js"
     ]
 }

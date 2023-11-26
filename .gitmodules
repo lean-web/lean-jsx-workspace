@@ -13,3 +13,9 @@
 	path = packages/create-lean-jsx-app
 	url = https://github.com/lean-web/create-lean-jsx-app
 	branch = main
+[submodule "packages/lean-web-utils"]
+	path = packages/lean-web-utils
+	url = https://github.com/lean-web/lean-web-utils
+[submodule "packages/lean-jsx-types"]
+	path = packages/lean-jsx-types
+	url = https://github.com/lean-web/lean-jsx-types

@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 
 export interface RequestQueryParams {
     withLoadingState?: boolean;
@@ -6,7 +6,7 @@ export interface RequestQueryParams {
     jsDisabled?: boolean;
 }
 
-declare module "lean-jsx/lib/context" {
+declare module "lean-jsx-types/lib/context" {
     interface SXLGlobalContext extends RequestQueryParams {}
 }
 

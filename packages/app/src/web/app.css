@@ -100,7 +100,11 @@ main {
 }
 
 .product {
-    & > h3 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    
+    & h3 {
         margin-top: 1px;
     }
     background-color: var(--product-background-color);
@@ -108,13 +112,15 @@ main {
     padding: 0.2rem;
     margin: 0.2rem;
 
-    /* Override link styles */
-    display: block;
-    cursor: pointer;
-    text-decoration: none;
-    color: white;
-    &:hover {
-        background-color: var(--product-background-color--hover);
+    & a {
+        /* Override link styles */
+        display: block;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        &:hover {
+            background-color: var(--product-background-color--hover);
+        }
     }
 }
 
@@ -154,5 +160,14 @@ main {
     }
     100% {
         transform: translateX(0);
+    }
+}
+
+
+.product-loading {
+    opacity: 0.5;
+    cursor: not-allowed;
+    & a,button{
+        cursor: not-allowed;
     }
 }

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import path from "path";
 import express from "express";
 import LeanApp from "./engine";
 import bodyParser from "body-parser";
@@ -8,15 +7,9 @@ import { ProductDescription } from "./products/product-description";
 import compression from "compression";
 import { parseQueryParams } from "./context";
 import { shouldCompress } from "lean-jsx/lib/server";
-import { ServerDateComponent, MainActionsPage } from "./actions/main";
+import { MainActionsPage } from "./actions/main";
 import { webAction } from "lean-jsx/lib/server/components";
-
-/**
- * Output path for the bundled assets:
- * Default path: /assets (relative to the server script)
- * Includes bundled JS and CSS
- */
-const ASSETS_PATH = path.resolve(__dirname, "/assets");
+import { deleteProduct } from "./services/products";
 
 /**
  * Output path for the "public" files:
@@ -77,16 +70,7 @@ function createServer() {
              * @returns  - the configured response
              */
             configResponse: (resp) => resp.set("Content-Security-Policy", CSP),
-            globalContextParser: (req, componentName) => {
-                console.log({ componentName });
-                if (componentName === ServerDateComponent.contentId) {
-                    return {
-                        ...parseQueryParams(req),
-                        ...{
-                            mmDDYY: Boolean(req.query?.mmDDYY),
-                        },
-                    };
-                }
+            globalContextParser: (req) => {
                 return parseQueryParams(req);
             },
         }),
@@ -110,6 +94,14 @@ function createServer() {
         );
     });
 
+    app.delete("/product/:productId", async (req, res) => {
+        const productId = req.params["productId"];
+
+        await deleteProduct(productId);
+
+        res.status(200).send();
+    });
+
     app.get("/actions", async (req, res, next) => {
         const globalContext = parseQueryParams(req);
 
@@ -125,9 +117,7 @@ function createServer() {
     });
 
     app.get("/about", async (req, res) => {
-        type UserContext = { user: { firstName: string } };
-
-        function MyComponent(this: UserContext) {
+        function MyComponent() {
             const user = { firstName: "John" };
             return (
                 <button
@@ -153,6 +143,8 @@ function createServer() {
     // configure the main page:
     app.use("/", async (req, res) => {
         const globalContext = parseQueryParams(req);
+
+        console.log({ globalContext });
 
         await LeanApp.render(
             res.set("Content-Security-Policy", CSP),

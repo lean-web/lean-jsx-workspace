@@ -11,6 +11,7 @@ export interface Product {
     name: string;
     description: string;
     reviews: Review[];
+    hidden: boolean;
 }
 
 const getReviews = (count: number): Review[] => {
@@ -28,6 +29,7 @@ const allProducts: Product[] = new Array(100).fill(true).map((_, index) => ({
     name: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
     reviews: getReviews(15),
+    hidden: false,
 }));
 
 async function wait(timeInMillis: number): Promise<void> {
@@ -41,10 +43,22 @@ async function wait(timeInMillis: number): Promise<void> {
 export async function fetchProducts(
     start: number,
     count: number,
-    timeout?: number
+    timeout?: number,
 ) {
-    await wait(timeout ?? 1500);
-    return allProducts.slice(start, start + count);
+    await wait(timeout ?? 500);
+    return allProducts
+        .filter((product) => product.hidden === false)
+        .slice(start, start + count);
+}
+
+export async function deleteProduct(id: string) {
+    await wait(500);
+    allProducts.forEach((product) => {
+        if (product.id === id) {
+            product.hidden = true;
+        }
+        return product;
+    });
 }
 
 export async function fetchProduct(productId: string) {

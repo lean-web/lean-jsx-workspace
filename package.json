@@ -5,7 +5,9 @@
         "packages/app",
         "packages/eslint-plugin-lean-jsx",
         "packages/create-lean-jsx-app",
-        "packages/lean-jsx-docs"
+        "packages/lean-jsx-docs",
+        "packages/lean-web-utils",
+        "packages/lean-jsx-types"
     ],
     "scripts": {
         "prepare": "husky install .config/husky",
@@ -17,7 +19,7 @@
         "@types/uuid": "^9.0.5",
         "@typescript-eslint/eslint-plugin": "^6.7.4",
         "@typescript-eslint/parser": "^6.7.4",
-        "eslint": "^8.51.0",
+        "eslint": "^8.53.0",
         "husky": "^8.0.3",
         "jest": "^29.7.0",
         "lerna": "^7.4.1",

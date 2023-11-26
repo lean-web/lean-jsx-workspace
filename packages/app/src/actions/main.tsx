@@ -1,22 +1,78 @@
 import { Layout } from "@/layout";
-import { GetDynamicComponent, webAction } from "lean-jsx/lib/server/components";
-import { SXLGlobalContext } from "lean-jsx/lib/context";
+import {
+    DynamicComponent,
+    type TrackedPromise,
+    webAction,
+    Register,
+} from "lean-jsx/lib/server/components";
+import type { SXLGlobalContext } from "lean-jsx-types/lib/context";
+import type { Request } from "express";
 
 async function getServerDate(): Promise<Date> {
     await Promise.resolve();
     return new Date();
 }
 
-export const ServerDateComponent = GetDynamicComponent<
+type ServerDateComponentContext = SXLGlobalContext & { mmDDYY?: boolean };
+
+async function wait(timeInMillis: number): Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, timeInMillis);
+    });
+}
+
+@Register
+export class JSComponent extends DynamicComponent<
+    string,
+    SXLGlobalContext,
+    { foo?: string } & SXL.Props
+> {
+    componentID = "dynamic-slow";
+
+    async fetcher() {
+        console.log({ props: this.props });
+        await wait(100);
+        return "Slow resource";
+    }
+
+    dynamicRender(
+        resource: TrackedPromise<string>,
+    ): SXL.StaticElement | SXL.AsyncElement {
+        if (resource.isPending) {
+            return <p id="loading2">Loading...</p>;
+        }
+        return (
+            <p id="loaded2">
+                {resource.value} {this.props.foo}
+            </p>
+        );
+    }
+}
+
+@Register
+export class ServerDateComponent extends DynamicComponent<
     Date,
-    SXLGlobalContext & { mmDDYY?: boolean }
->(
-    "my-server-date-component",
-    async () => {
+    ServerDateComponentContext
+> {
+    componentID = "my-server-date-component";
+
+    async fetcher() {
         const serverDate = await getServerDate();
         return serverDate;
-    },
-    (data, props) => {
+    }
+
+    queryParams(req: Request) {
+        return {
+            mmDDYY: Boolean(req.query?.mmDDYY),
+        };
+    }
+
+    dynamicRender(
+        data: TrackedPromise<Date>,
+        props: SXL.Props<ServerDateComponentContext>,
+    ): SXL.StaticElement | SXL.AsyncElement {
         if (data.isPending) {
             return <>Loading...</>;
         }
@@ -32,15 +88,15 @@ export const ServerDateComponent = GetDynamicComponent<
             return <div>Server date: {dateFormatted}</div>;
         }
         return <div>Server date: {serverDate.toISOString()}</div>;
-    },
-);
+    }
+}
 
 export function ReplacerComponent() {
     return (
         <>
             <button
                 onclick={webAction({}, (ev, webContext) => {
-                    webContext?.actions?.refetchElement(
+                    void webContext?.actions?.refetchElement(
                         "my-server-date-component",
                         {
                             mmDDYY: true,
@@ -53,7 +109,7 @@ export function ReplacerComponent() {
             <button
                 onclick={webAction({}, (ev, webContext) => {
                     console.log("Replace");
-                    webContext?.actions?.refetchElement(
+                    void webContext?.actions?.refetchElement(
                         "my-server-date-component",
                         {},
                     );
@@ -97,8 +153,26 @@ export function MainActionsPage() {
             </div>
             <div>
                 <h2>Server date:</h2>
-                <ServerDateComponent.Render />
+                <ServerDateComponent />
             </div>
+            <JSComponent foo="bar" />
+
+            <header-menu
+                id="dc1"
+                name="bar2"
+                address={{ street: "18521 Derby", zip: "78660" }}
+            ></header-menu>
+            <button
+                type="button"
+                id="btn"
+                onclick={webAction({}, (ev, ctx) => {
+                    ctx?.actions.update<"header-menu">("dc1", {
+                        name: `${new Date().toISOString()}`,
+                    });
+                })}
+            >
+                Click
+            </button>
         </Layout>
     );
 }

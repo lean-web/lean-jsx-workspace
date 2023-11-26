@@ -16,6 +16,9 @@ module.exports = {
         project: [
             "./packages/core/tsconfig.json",
             "./packages/app/tsconfig.json",
+            "./packages/lean-web-utils/tsconfig.node.json",
+            "./packages/lean-web-utils/tsconfig.json",
+            "./packages/lean-jsx-types/tsconfig.json",
         ],
     },
     plugins: ["@typescript-eslint", "eslint-plugin-lean-jsx"],

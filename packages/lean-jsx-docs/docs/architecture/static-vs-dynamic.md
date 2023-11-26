@@ -80,6 +80,36 @@ These two handlers in conjunction, perform the following actions:
 
 ![Activity diagram showing how JavaScript-based content is fetched after page finishes loading](/img/js-content-diagram.png)
 
+## Class-based dynamic components
+
+A newer alternative to `GetDynamicComponent` is extending the `DynamicComponent` abstract class:
+
+```tsx
+@Register
+export class JSComponent extends DynamicComponent<string> {
+    componentID = "dynamic-slow";
+
+    async fetcher() {
+        await wait(100);
+        return "Slow resource";
+    }
+
+    dynamicRender(
+        resource: TrackedPromise<string>,
+    ): SXL.StaticElement | SXL.AsyncElement {
+        if (resource.isPending) {
+            return <p id="loading2">Loading...</p>;
+        }
+        return <p id="loaded2">{resource.value}</p>;
+    }
+}
+
+//...
+<JSComponent/>
+```
+
+The `@Register` decorator automatically registers this component in the LeanJSX engine, creating an API endpoint that the browser can request to update the component's contents.
+
 How is this different from just using React or any other framework directly?
 
 - Unlike common JS framework flows, the async API request returns **HTML**, instead of data content like JSON. Then, the whole placeholder is replaced. This approach allows us to avoid having to track internal state for `JSComponent` and building the content on the browser. The DOM update can be done efficiently.

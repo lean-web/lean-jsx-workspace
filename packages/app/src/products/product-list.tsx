@@ -1,22 +1,47 @@
-import { RequestQueryParams } from "../context";
-import { fetchProducts, Product } from "../services/products";
+import type { RequestQueryParams } from "../context";
+import { fetchProducts, type Product } from "../services/products";
 import {
     GetDynamicComponent,
     toQueryString,
+    webAction,
 } from "lean-jsx/lib/server/components";
 
-export function ProductListDetails({
-    product,
-    globalContext,
-}: { product: Product } & { globalContext?: RequestQueryParams }) {
+function deleteProduct(id: string) {
+    return webAction({ id }, async function (ev, ctx) {
+        const container = (ev?.currentTarget as HTMLElement | null | undefined)
+            ?.parentElement;
+
+        const link = container?.querySelector("a");
+        if (link) {
+            link.href = "#";
+        }
+
+        container?.classList.add("product-loading");
+        await fetch(`/product/${ctx?.data.id}`, {
+            method: "DELETE",
+        });
+
+        await ctx?.actions.refetchElement("product-list", {});
+
+        container?.classList.remove("product-loading");
+    });
+}
+
+export function ProductListDetails(
+    this: { id: string },
+    {
+        product,
+        globalContext,
+    }: { product: Product } & { globalContext?: RequestQueryParams },
+) {
     return (
-        <a
-            href={toQueryString(`/product/${product.id}`, globalContext)}
-            className="product"
-        >
-            <h3>{product.name}</h3>
-            <p>{product.description.slice(0, 50)}</p>
-        </a>
+        <div className="product">
+            <a href={toQueryString(`/product/${product.id}`, globalContext)}>
+                <h3>{product.name}</h3>
+                <p>{product.description.slice(0, 50)}</p>
+            </a>
+            <button onclick={deleteProduct(product.id)}>Delete</button>
+        </div>
     );
 }
 
@@ -32,7 +57,7 @@ export function ProductListDetails({
 export async function ProductList({
     start,
 }: { start: number } & { globalContext?: RequestQueryParams }) {
-    const products = await fetchProducts(start, 10, 3000);
+    const products = await fetchProducts(start, 10, 300);
     return (
         <div>
             <h2>Products</h2>
@@ -75,7 +100,7 @@ export function ProductListLoading() {
  */
 export const DynamicProductList = GetDynamicComponent(
     "product-list",
-    () => fetchProducts(0, 10, 3000),
+    () => fetchProducts(0, 10, 300),
     (maybeResource) => {
         if (maybeResource.isResolved) {
             const products = maybeResource.value;
@@ -93,5 +118,5 @@ export const DynamicProductList = GetDynamicComponent(
             );
         }
         return <ProductListLoading />;
-    }
+    },
 );

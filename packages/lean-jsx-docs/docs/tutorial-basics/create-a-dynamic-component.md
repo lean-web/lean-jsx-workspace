@@ -6,7 +6,9 @@ sidebar_position: 5
 
 For a component to have dynamic behavior -that is, to being able to update or re-render its contents without reloading the whole page- it needs to be explicitely configured as a **dynamic component**.
 
-Currently, creating a dynamic process is a bit more convolved process than creating a static component, and it requires the usage of the `GetDynamicComponent` helper function:
+Currently, creating a dynamic component can be achived in two ways: Using the `GetDynamicComponent` helper function, or extending the `DynamicComponent` abstract class:
+
+## GetDynamicComponent
 
 ```jsx
 export const MyDynamicComponent = GetDynamicComponent<MyData,SXLGlobalContext>(
@@ -34,6 +36,45 @@ The `GetDynamicComponent` function receives three arguments:
 - Component ID (`string`): A unique ID used to identify the dynamic component.
 - Data Fetcher (`() => MyData`): A function that returns a `Promise` with the data the component needs to fetch. The type for the Promise contents is passed in the `GetDynamicComponent` first type parameter (e.g. `MyData`).
 - Render function: (`(data:TrackedPromise<MyData>, props: SXL.Props) => JSX.Element`): A function that receives the promise returned by the data fetcher, wrapped in `TrackedPromise` -which is an extension for `Promise` that exposes methods for tracking its state-, and the props passed to the component.
+
+## Extending DynamicComponent
+
+A more traditional-component approach to create dynamic components is to extend the `DynamicComponent` abstract class:
+
+
+```tsx
+@Register
+export class JSComponent extends DynamicComponent<string> {
+    componentID = "dynamic-slow";
+
+    async fetcher() {
+        await wait(100);
+        return "Slow resource";
+    }
+
+    dynamicRender(
+        resource: TrackedPromise<string>,
+    ): SXL.StaticElement | SXL.AsyncElement {
+        if (resource.isPending) {
+            return <p id="loading2">Loading...</p>;
+        }
+        return <p id="loaded2">{resource.value}</p>;
+    }
+}
+
+//...
+<JSComponent/>
+```
+
+Just like the `GetDynamicComponent`, extending `DynamicComponent` requires you to override three parts:
+
+- `componentID`: (`string`) The unique string ID used to identify this component. Notice that this can be different from the actual component name that will be used in the JSX markup (`JSComponent` vs `dynamic-slow`).
+- `fetcher`: (`(props: Props) => Promise<T>`) The function that will be used to retrieve the asynchronous data a component will need to be rendered.
+- `dynamicRender`: (`(data: TrackedPromise<T>, props: Props) => SXL.StaticElement | SXL.AsyncElement`) The function that will render the components content, based on the state of the fetched data (`TrackedPromise` is a thin wrapper around `Promise` which expose its fullfilment state).
+
+Also, notice the use of the `@Register` decorator on the component definition. This is needed to auto-register the component in LeanJSX's engine -creating an API endpoint for it-.
+
+Optionally, the component class can override the `queryParams` method, which receives a reference to the server's `Request` object, and returns an object. These query params are set using the **webAction** helper.
 
 ## Updating a dynamic component
 
@@ -65,17 +106,31 @@ Let us create an example to understand how to update dynamic components.
 
 First, we will create a dynamic component called `ServerDateComponent`:
 
-```jsx
-export const ServerDateComponent = GetDynamicComponent<
+```tsx
+type ServerDateComponentContext = SXLGlobalContext & { mmDDYY?: boolean };
+
+@Register
+export class ServerDateComponent extends DynamicComponent<
     Date,
-    SXLGlobalContext & { mmDDYY?: boolean }
->(
-    "my-server-date-component",
-    async () => {
+    ServerDateComponentContext
+> {
+    componentID = "my-server-date-component";
+
+    async fetcher() {
         const serverDate = await getServerDate();
         return serverDate;
-    },
-    (data, props) => {
+    }
+
+    queryParams(req: Request) {
+        return {
+            mmDDYY: Boolean(req.query?.mmDDYY),
+        };
+    }
+
+    dynamicRender(
+        data: TrackedPromise<Date>,
+        props: SXL.Props<ServerDateComponentContext>,
+    ): SXL.StaticElement | SXL.AsyncElement {
         if (data.isPending) {
             return <>Loading...</>;
         }
@@ -91,19 +146,15 @@ export const ServerDateComponent = GetDynamicComponent<
             return <div>Server date: {dateFormatted}</div>;
         }
         return <div>Server date: {serverDate.toISOString()}</div>;
-    },
-);
-
-// ...
-
-<ServerDateComponent.Render />
+    }
+}
 ```
 
 The `ServerDateComponent` does a couple of things:
 
-- Two type parameters are passed to the `GetDynamicComponent` signature:
+- Two type parameters are passed to the `DynamicComponent` signature:
   - `Date`: The type for the data returned by the fetcher.
-  - `SXLGlobalContext & { mmDDYY?: boolean }`: An extension of the global context `SXLGlobalContext` with the boolean query parameter `mmDDYY`.
+  - `ServerDateComponentContext`: An extension of the global context `SXLGlobalContext` with the boolean query parameter `mmDDYY`.
 - We pass a fetcher function that retrieves a date from the server using `getServerDate()`.
 - While the component is fetching the server date, a `Loading` message will be displayed.
 - Once the promise is resolved, the server `Date` object is retrieved using `data.value`.
@@ -158,29 +209,8 @@ After rendering both components, we can see the dynamic component being updated 
 
 ![A GIF animation showing how the server date rendered by the dynamic component is updated every time one of the buttons is clicked](./dynamic-component-action.gif)
 
-### Configuring query params in the middlware
+In short, dynamic components allow us to explicitely choose what parts of our application will need to be rendered using JavaScript and updated without refreshing the whole page. With LeanJSX components, the following concerns are taken care for **free**:
 
-Currently, query parameters like `mmDDYY` need to be configured in LeanJSX middleware to be parsed from the request query parameters if they are not part of the global context:
-
-```jsx
-app.use(
-    LeanApp.middleware({
-        configResponse: (resp) => resp.set("Content-Security-Policy", CSP),
-        globalContextParser: (req, componentId) => {
-            if (componentId === ServerDateComponent.contentId) {
-                return {
-                    ...parseQueryParams(req),
-                    ...{
-                        mmDDYY: Boolean(req.query?.mmDDYY),
-                    },
-                };
-            }
-            return parseQueryParams(req);
-        },
-    }),
-);
-```
-
-We add a check in `globalContextParser` to see if `componentId` matches our component's ID, and if it does, we parse the `mmDDYY` query param. This allows us have query params that are specific to a component without polluting the global context.
-
-> Note: The middleware configuration may not be needed in future versions of LeanJSX.
+- Writing the JavaScript code to request data and update the page content.
+- Writing the API endpoint code for dealing with the data request.
+- Writing the JavaScript code to wire everything together.
