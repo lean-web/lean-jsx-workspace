@@ -2,7 +2,7 @@
 build
 coverage
 dist
-lib
+lib/**/*.{js,d.ts}
 docs
 
 node_modules

@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Test project generator",
+            "program": "${workspaceFolder}/packages/create-lean-jsx-app/index.js",
+            "args": ["myapp", "-n", "myapp", "-d", "A lean-jsx-powered app"],
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch Sample App",

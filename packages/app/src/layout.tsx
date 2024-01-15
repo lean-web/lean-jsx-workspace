@@ -16,7 +16,7 @@ function ProductListWrapper({
     productListStart?: number;
     globalContext?: SXLGlobalContext;
 }) {
-    if (globalContext?.dynamicProductList) {
+    if (globalContext?.dynamicProductList && DynamicProductList.Render) {
         return <DynamicProductList.Render />;
     }
 

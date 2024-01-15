@@ -2,7 +2,7 @@ import { Layout } from "@/layout";
 import {
     DynamicComponent,
     type TrackedPromise,
-    webAction,
+    withClientData,
     Register,
 } from "lean-jsx/lib/server/components";
 import type { SXLGlobalContext } from "lean-jsx-types/lib/context";
@@ -32,7 +32,6 @@ export class JSComponent extends DynamicComponent<
     componentID = "dynamic-slow";
 
     async fetcher() {
-        console.log({ props: this.props });
         await wait(100);
         return "Slow resource";
     }
@@ -95,7 +94,7 @@ export function ReplacerComponent() {
     return (
         <>
             <button
-                onclick={webAction({}, (ev, webContext) => {
+                onclick={withClientData({}, (ev, webContext) => {
                     void webContext?.actions?.refetchElement(
                         "my-server-date-component",
                         {
@@ -107,7 +106,7 @@ export function ReplacerComponent() {
                 Get server date on mm/dd/yyyy format
             </button>
             <button
-                onclick={webAction({}, (ev, webContext) => {
+                onclick={withClientData({}, (ev, webContext) => {
                     console.log("Replace");
                     void webContext?.actions?.refetchElement(
                         "my-server-date-component",
@@ -165,7 +164,7 @@ export function MainActionsPage() {
             <button
                 type="button"
                 id="btn"
-                onclick={webAction({}, (ev, ctx) => {
+                onclick={withClientData({}, (ev, ctx) => {
                     ctx?.actions.update<"header-menu">("dc1", {
                         name: `${new Date().toISOString()}`,
                     });

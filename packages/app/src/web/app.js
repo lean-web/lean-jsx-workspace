@@ -7,3 +7,5 @@
 //     svelteComponent: HeaderMenu,
 //     propNames: ["name", "address"],
 // });
+
+console.log("hello");

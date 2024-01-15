@@ -32,5 +32,5 @@
         "vite-plugin-compression": "^0.5.1",
         "vite-svg-loader": "^4.0.0"
     },
-    "sideEffects": ["src/web/__autogen__/sxlActionHandlers.js"]
+    "sideEffects": ["src/web/__autogen__/sxlActionHandlers.js", "src/core"]
 }

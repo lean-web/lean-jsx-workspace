@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import express from "express";
+import express, { type Response } from "express";
 import LeanApp from "./engine";
 import bodyParser from "body-parser";
 import { Home } from "./home/home";
@@ -8,7 +8,7 @@ import compression from "compression";
 import { parseQueryParams } from "./context";
 import { shouldCompress } from "lean-jsx/lib/server";
 import { MainActionsPage } from "./actions/main";
-import { webAction } from "lean-jsx/lib/server/components";
+import { withClientData } from "lean-jsx/lib/server/components";
 import { deleteProduct } from "./services/products";
 
 /**
@@ -76,6 +76,28 @@ function createServer() {
         }),
     );
 
+    app.get("/stream", function (req, res, next) {
+        //when using text/plain it did not stream
+        //without charset=utf-8, it only worked in Chrome, not Firefox
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Transfer-Encoding", "chunked");
+
+        res.write("Thinking...");
+        sendAndSleep(res, 1);
+    });
+
+    const sendAndSleep = function (response: Response, counter) {
+        if (counter > 10) {
+            response.end();
+        } else {
+            response.write(" ;i=" + counter);
+            counter++;
+            setTimeout(function () {
+                sendAndSleep(response, counter);
+            }, 1000);
+        }
+    };
+
     // Configure a page for a specific product
     app.get("/product/:productId", async (req, res, next) => {
         const productId = req.params["productId"];
@@ -121,7 +143,7 @@ function createServer() {
             const user = { firstName: "John" };
             return (
                 <button
-                    onclick={webAction(user, (ev, webContext) => {
+                    onclick={withClientData(user, (ev, webContext) => {
                         alert(`Hello ${webContext?.data.firstName}`);
                     })}
                 >
@@ -143,8 +165,6 @@ function createServer() {
     // configure the main page:
     app.use("/", async (req, res) => {
         const globalContext = parseQueryParams(req);
-
-        console.log({ globalContext });
 
         await LeanApp.render(
             res.set("Content-Security-Policy", CSP),

@@ -1,6 +1,50 @@
 <body>
+
+    <script>
+        function waitForElm(selector) {
+            return new Promise(resolve => {
+                if (document.querySelector(selector)) {
+                    return resolve(document.querySelector(selector));
+                }
+
+                const observer = new MutationObserver(mutations => {
+                    if (document.querySelector(selector)) {
+                        observer.disconnect();
+                        resolve(document.querySelector(selector));
+                    }
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            });
+        }
+
+        function addEventListener(querySelector, event, handler) {
+            const element = document.querySelector(querySelector)
+            if (!element) {
+                waitForElm('#click1').then((elm) => {
+                    console.log('Element is ready');
+                    elm.addEventListener(event, handler)
+                });
+            } else {
+                element.addEventListener(event, handler)
+            }
+        }
+
+
+
+    </script>
     <div id="el"></div>
 
+    <script>
+        
+        addEventListener('#click1', 'click', (ev) => {
+            console.log('Clocked1', ev)
+        })
+    
+    </script>
     <button id="click1" type="button">
         Emit1
     </button>
@@ -8,6 +52,14 @@
     <button id="click2" type="button">
         Emit2
     </button>
+
+    <script>
+        
+        addEventListener('#click2', 'click', (ev) => {
+            console.log('Clocked2', ev)
+        })
+    
+    </script>
 
     <my-custom-element id="cmp1" size="100">a</my-custom-element>
     <my-custom-element id="cmp2" size="100">b</my-custom-element>
