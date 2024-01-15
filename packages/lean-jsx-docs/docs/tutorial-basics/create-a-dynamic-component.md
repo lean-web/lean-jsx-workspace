@@ -74,15 +74,15 @@ Just like the `GetDynamicComponent`, extending `DynamicComponent` requires you t
 
 Also, notice the use of the `@Register` decorator on the component definition. This is needed to auto-register the component in LeanJSX's engine -creating an API endpoint for it-.
 
-Optionally, the component class can override the `queryParams` method, which receives a reference to the server's `Request` object, and returns an object. These query params are set using the **webAction** helper.
+Optionally, the component class can override the `queryParams` method, which receives a reference to the server's `Request` object, and returns an object. These query params are set using the **withClientData** helper.
 
 ## Updating a dynamic component
 
-All dynamic components can be updated using the [webAction](/docs/architecture/state-and-context#the-webaction-helper) helper:
+All dynamic components can be updated using the [withClientData](/docs/architecture/state-and-context#the-webaction-helper) helper:
 
 ```jsx
 <button
-    onclick={webAction({}, (ev, webContext) => {
+    onclick={withClientData({}, (ev, webContext) => {
         webContext?
           .actions?
           .refetchElement("my-dynamic-component", {
@@ -169,7 +169,7 @@ export function ReplacerComponent() {
     return (
         <>
             <button
-                onclick={webAction({}, (ev, webContext) => {
+                onclick={withClientData({}, (ev, webContext) => {
                     webContext?.actions?.refetchElement(
                         "my-server-date-component",
                         {
@@ -181,7 +181,7 @@ export function ReplacerComponent() {
                 Get server date on mm/dd/yyyy format
             </button>
             <button
-                onclick={webAction({}, (ev, webContext) => {
+                onclick={withClientData({}, (ev, webContext) => {
                     console.log("Replace");
                     webContext?.actions?.refetchElement(
                         "my-server-date-component",
@@ -200,7 +200,7 @@ export function ReplacerComponent() {
 
 Notice a few things here:
 
-- Static components *can* use the `webAction` helper. A component doesn't need to be a dynamic component to update another dynamic component.
+- Static components *can* use the `withClientData` helper. A component doesn't need to be a dynamic component to update another dynamic component.
 - The component renders two buttons, both of which updates the dynamic component using its ID (`"my-server-date-component"`):
   - The first button passes the `mmDDYY` query parameter set to `true`.
   - The second button passes no query parameters, which will re-render the dynamic component using its default state (rendering the date in ISO format).

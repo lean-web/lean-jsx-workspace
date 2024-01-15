@@ -129,20 +129,20 @@ This component will be rendered as follows:
 
 By allowing developers to set content into the component's function `this` scope, we allow them to choose what data they want to expose to the client, preserving sensitive data on the server's scope.
 
-## The webAction helper
+## The withClientData helper
 
-An alternative to setting values to the component's scope is to use the `webAction` helper:
+An alternative to setting values to the component's scope is to use the `withClientData` helper:
 
 
 
 ```jsx
-import { webAction } from "lean-jsx/lib/server/components";
+import { withClientData } from "lean-jsx/lib/server/components";
 
 function MyComponent(this: UserContext) {
     const user = { firstName: "John" };
     return (
         <button
-            onclick={webAction(user, (ev, webContext) => {
+            onclick={withClientData(user, (ev, webContext) => {
                 alert(`Hello ${webContext?.data.firstName}`);
             })}
         >
@@ -152,9 +152,9 @@ function MyComponent(this: UserContext) {
 }
 ```
 
-Data that needs to be serialized to the browser must be passed as the first parameter to `webAction`.
+Data that needs to be serialized to the browser must be passed as the first parameter to `withClientData`.
 
-The second parameter is the handler function, which receives the `Event` object for the handler in addition to a second parameter `webContext`. This object has a `data` attribute, which contains the data passed as the first parameter of `webAction`.
+The second parameter is the handler function, which receives the `Event` object for the handler in addition to a second parameter `webContext`. This object has a `data` attribute, which contains the data passed as the first parameter of `withClientData`.
 
 This component would be rendered to as follows:
 

@@ -14,6 +14,16 @@ export function Home({ productIndexStart, arg2 }: HomeParams) {
 
             <p>Choose a product to start: {arg2}</p>
 
+            <form
+                method="POST"
+                action="/product"
+                onsubmit={(ev) => {
+                    ev.preventDefault();
+                    return false;
+                }}
+            >
+                <button type="submit">Add to cart</button>
+            </form>
             {logo}
         </Layout>
     );
