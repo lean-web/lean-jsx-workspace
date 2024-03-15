@@ -1,6 +1,6 @@
 import { resolve, basename, extname } from "path";
-import vitePlugin from "lean-jsx/lib/plugins/vite.js";
-import esbuildPlugin from "lean-jsx/lib/plugins/esbuild.js";
+import vitePlugin from "lean-jsx/plugins/vite";
+import esbuildPlugin from "lean-jsx/plugins/esbuild";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import packageJSON from "./package.json" assert { type: "json" };
 const { dependencies } = packageJSON;

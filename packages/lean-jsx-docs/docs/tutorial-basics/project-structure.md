@@ -98,7 +98,7 @@ The file also includes an example of how to use LeanJSX's Express middleware for
 This scripts creates the instance of LeanJSX engine that will be used by `express.tsx`. It contains default startup configurations:
 
 ```ts
-import { buildApp } from "lean-jsx/lib/server";
+import { buildApp } from "lean-jsx/server";
 import path from "path";
 
 const INDEX_HTML_PATH = path.resolve(__dirname, "index.html");

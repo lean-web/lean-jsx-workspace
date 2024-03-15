@@ -1,5 +1,5 @@
-import { RequestQueryParams } from "../context";
-import { toQueryString } from "lean-jsx/lib/server/components";
+import type { RequestQueryParams } from "../context";
+import { toQueryString } from "lean-jsx/server/components";
 
 interface NavItemProps extends SXL.Props {
     title: string;
@@ -10,11 +10,7 @@ function NavItem(props: NavItemProps) {
         <details className="section">
             <summary>{props.title}</summary>
 
-            <ul>
-                {props.children?.map((child) => (
-                    <li>{child}</li>
-                ))}
-            </ul>
+            <ul>{props.children?.map((child) => <li>{child}</li>)}</ul>
         </details>
     );
 }

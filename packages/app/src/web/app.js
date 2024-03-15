@@ -1,6 +1,7 @@
 // import HeaderMenu from "./header.svelte";
-// import { registerSvelteComponent } from "lean-web-utils/lib/web";
+// import { registerSvelteComponent } from "lean-web-utils/web";
 // import "htmx.org";
+import { refetchElement } from "lean-web-utils/web";
 
 // registerSvelteComponent({
 //     name: "header-menu",
@@ -9,3 +10,4 @@
 // });
 
 console.log("hello");
+console.log({ refetchElement });

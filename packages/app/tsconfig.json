@@ -22,7 +22,7 @@
         "noImplicitAny": false,
         "verbatimModuleSyntax": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "lean-jsx/lib/jsx",
+        "jsxImportSource": "lean-jsx/jsx",
         "paths": {
             "@/": ["./src/"],
             "@/*": ["./src/*"]

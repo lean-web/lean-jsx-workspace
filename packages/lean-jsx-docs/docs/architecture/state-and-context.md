@@ -136,7 +136,7 @@ An alternative to setting values to the component's scope is to use the `withCli
 
 
 ```jsx
-import { withClientData } from "lean-jsx/lib/server/components";
+import { withClientData } from "lean-jsx/server/components";
 
 function MyComponent(this: UserContext) {
     const user = { firstName: "John" };

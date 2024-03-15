@@ -7,10 +7,9 @@ import {
 } from "../services/products";
 import {
     APIComponent,
-    GetDynamicComponent,
     toQueryString,
     withClientData,
-} from "lean-jsx/lib/server/components";
+} from "lean-jsx/server/components";
 
 function deleteProduct(id: string) {
     return withClientData({ id }, async function (ev, ctx) {
@@ -71,7 +70,7 @@ export function ProductListDetails({
 APIComponent(
     {
         id: "product",
-        queryParams: (req) => ({
+        requestHandler: (req) => ({
             productId: req.query?.id?.toString() ?? "",
         }),
         cache: "public, max-age=30",
@@ -143,14 +142,14 @@ export async function* ProductList_({
 }
 
 export const ProductList = APIComponent<{ start: number }, SXL.AsyncGenElement>(
-    { id: "product-list", queryParams: (_req) => ({ start: 0 }) },
+    { id: "product-list", requestHandler: (_req) => ({ start: 0 }) },
     ProductList_,
 );
 
 export const Something = APIComponent(
     {
         id: "hello",
-        queryParams: function (
+        requestHandler: function (
             _req: Request,
         ): Record<string, string | number | boolean> {
             return {};
@@ -195,25 +194,25 @@ export function ProductListLoading() {
  * Product List: Async component version.
  * Will load asynchronously using JavaSCript.
  */
-export const DynamicProductList = GetDynamicComponent(
-    "product-list2",
-    () => fetchProducts(0, 10, 300),
-    (maybeResource) => {
-        if (maybeResource.isResolved) {
-            const products = maybeResource.value;
-            return (
-                <div>
-                    <h2>Products</h2>
-                    <ul className="product-list">
-                        {products.map((product) => (
-                            <li>
-                                <ProductListDetails product={product} />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            );
-        }
-        return <ProductListLoading />;
-    },
-);
+// export const DynamicProductList = GetDynamicComponent(
+//     "product-list2",
+//     () => fetchProducts(0, 10, 300),
+//     (maybeResource) => {
+//         if (maybeResource.isResolved) {
+//             const products = maybeResource.value;
+//             return (
+//                 <div>
+//                     <h2>Products</h2>
+//                     <ul className="product-list">
+//                         {products.map((product) => (
+//                             <li>
+//                                 <ProductListDetails product={product} />
+//                             </li>
+//                         ))}
+//                     </ul>
+//                 </div>
+//             );
+//         }
+//         return <ProductListLoading />;
+//     },
+// );

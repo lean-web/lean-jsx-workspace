@@ -6,7 +6,7 @@ export interface RequestQueryParams {
     jsDisabled?: boolean;
 }
 
-declare module "lean-jsx-types/lib/context" {
+declare module "lean-jsx-types/context" {
     interface SXLGlobalContext extends RequestQueryParams {}
 }
 

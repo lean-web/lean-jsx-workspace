@@ -12,7 +12,9 @@
     "scripts": {
         "prepare": "husky install .config/husky",
         "submodules": "git submodule update --init --recursive && npm install",
-        "update-submodules": "git submodule update --remote"
+        "update-submodules": "git submodule update --remote",
+        "versions": "node ./scripts/get_versions.js",
+        "bump-generator": "node ./scripts/bump_generator_versions.js"
     },
     "devDependencies": {
         "@types/node": "^20.8.3",

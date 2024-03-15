@@ -21,7 +21,7 @@ app.get("/about", async (req, res) => {
 The `LeanApp.render` function will use by default the template registered as `index` in LeanJSX's `buildApp`:
 
 ```jsx
-import { buildApp } from "lean-jsx/lib/server";
+import { buildApp } from "lean-jsx/server";
 import path from "path";
 
 const INDEX_HTML_PATH = path.resolve(__dirname, "index.html");

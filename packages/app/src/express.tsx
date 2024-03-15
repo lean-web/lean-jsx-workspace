@@ -6,10 +6,11 @@ import { Home } from "./home/home";
 import { ProductDescription } from "./products/product-description";
 import compression from "compression";
 import { parseQueryParams } from "./context";
-import { shouldCompress } from "lean-jsx/lib/server";
+import { shouldCompress } from "lean-jsx/server";
 import { MainActionsPage } from "./actions/main";
-import { withClientData } from "lean-jsx/lib/server/components";
+import { withClientData } from "lean-jsx/server/components";
 import { deleteProduct } from "./services/products";
+import { CheckAllProps } from "./components/intrinsic-props-tests";
 
 /**
  * Output path for the "public" files:
@@ -21,7 +22,7 @@ const PUBLIC_PATH = __dirname;
 /**
  * Content-Security-Policy
  */
-const CSP = `default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'`;
+const CSP = `default-src 'none'; script-src 'self' 'unsafe-inline'; frame-src https://www.example.com; connect-src 'self'; img-src https://via.placeholder.com 'self'; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'`;
 
 /**
  * Create the Express server
@@ -104,6 +105,7 @@ function createServer() {
         const globalContext = parseQueryParams(req);
 
         await LeanApp.renderWithTemplate(
+            req,
             res
                 .set("Content-Security-Policy", CSP)
                 .set("Transfer-Encoding", "chunked"),
@@ -128,6 +130,7 @@ function createServer() {
         const globalContext = parseQueryParams(req);
 
         await LeanApp.render(
+            req,
             res.set("Content-Security-Policy", CSP),
             <MainActionsPage />,
             {
@@ -153,6 +156,7 @@ function createServer() {
         }
 
         await LeanApp.render(
+            req,
             res.set("Content-Security-Policy", CSP),
             <main>
                 <h1>About</h1>
@@ -163,10 +167,25 @@ function createServer() {
     });
 
     // configure the main page:
+    app.use("/intrinsic", async (req, res) => {
+        const globalContext = parseQueryParams(req);
+
+        await LeanApp.render(
+            req,
+            res.set("Content-Security-Policy", CSP),
+            <CheckAllProps />,
+            {
+                globalContext,
+            },
+        );
+    });
+
+    // configure the main page:
     app.use("/", async (req, res) => {
         const globalContext = parseQueryParams(req);
 
         await LeanApp.render(
+            req,
             res.set("Content-Security-Policy", CSP),
             <Home arg2="This is an arg" />,
             {

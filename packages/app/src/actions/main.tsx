@@ -1,19 +1,10 @@
 import { Layout } from "@/layout";
-import {
-    DynamicComponent,
-    type TrackedPromise,
-    withClientData,
-    Register,
-} from "lean-jsx/lib/server/components";
-import type { SXLGlobalContext } from "lean-jsx-types/lib/context";
-import type { Request } from "express";
+import { APIComponent, withClientData } from "lean-jsx/server/components";
 
 async function getServerDate(): Promise<Date> {
     await Promise.resolve();
     return new Date();
 }
-
-type ServerDateComponentContext = SXLGlobalContext & { mmDDYY?: boolean };
 
 async function wait(timeInMillis: number): Promise<void> {
     return new Promise((resolve) => {
@@ -23,62 +14,36 @@ async function wait(timeInMillis: number): Promise<void> {
     });
 }
 
-@Register
-export class JSComponent extends DynamicComponent<
-    string,
-    SXLGlobalContext,
-    { foo?: string } & SXL.Props
-> {
-    componentID = "dynamic-slow";
-
-    async fetcher() {
-        await wait(100);
-        return "Slow resource";
-    }
-
-    dynamicRender(
-        resource: TrackedPromise<string>,
-    ): SXL.StaticElement | SXL.AsyncElement {
-        if (resource.isPending) {
-            return <p id="loading2">Loading...</p>;
-        }
+const JSComponent = APIComponent(
+    {
+        id: "dynamic-slow",
+        requestHandler: async () => {
+            await wait(100);
+            console.log({ resource: "Slow resource", foo: "" });
+            return { resource: "Slow resource", foo: "" };
+        },
+    },
+    ({ resource, foo }) => {
+        console.log({ resource, foo });
         return (
             <p id="loaded2">
-                {resource.value} {this.props.foo}
+                {resource} {foo}
             </p>
         );
-    }
-}
+    },
+);
 
-@Register
-export class ServerDateComponent extends DynamicComponent<
-    Date,
-    ServerDateComponentContext
-> {
-    componentID = "my-server-date-component";
-
-    async fetcher() {
-        const serverDate = await getServerDate();
-        return serverDate;
-    }
-
-    queryParams(req: Request) {
-        return {
-            mmDDYY: Boolean(req.query?.mmDDYY),
-        };
-    }
-
-    dynamicRender(
-        data: TrackedPromise<Date>,
-        props: SXL.Props<ServerDateComponentContext>,
-    ): SXL.StaticElement | SXL.AsyncElement {
-        if (data.isPending) {
-            return <>Loading...</>;
-        }
-
-        const serverDate: Date = data.value;
-
-        if (props?.globalContext?.mmDDYY) {
+export const ServerDateComponent = APIComponent(
+    {
+        id: "my-server-date-component",
+        requestHandler: async (req) => {
+            const mmDDYY = Boolean(req.query?.mmDDYY);
+            const serverDate = await getServerDate();
+            return { serverDate, mmDDYY };
+        },
+    },
+    ({ serverDate, mmDDYY }) => {
+        if (mmDDYY) {
             const dateFormatted = new Intl.DateTimeFormat("en-US", {
                 year: "numeric",
                 month: "2-digit",
@@ -87,8 +52,8 @@ export class ServerDateComponent extends DynamicComponent<
             return <div>Server date: {dateFormatted}</div>;
         }
         return <div>Server date: {serverDate.toISOString()}</div>;
-    }
-}
+    },
+);
 
 export function ReplacerComponent() {
     return (
@@ -152,9 +117,9 @@ export function MainActionsPage() {
             </div>
             <div>
                 <h2>Server date:</h2>
-                <ServerDateComponent />
+                <ServerDateComponent serverDate={new Date()} mmDDYY={false} />
             </div>
-            <JSComponent foo="bar" />
+            <JSComponent foo="bar" resource={""} />
 
             <header-menu
                 id="dc1"

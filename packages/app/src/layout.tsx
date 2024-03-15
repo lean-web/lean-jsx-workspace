@@ -1,8 +1,8 @@
-import { Lazy } from "lean-jsx/lib/server/components";
-import type { SXLGlobalContext } from "lean-jsx-types/lib/context";
+import { Lazy } from "lean-jsx/server/components";
+import type { SXLGlobalContext } from "lean-jsx-types/context";
 
 import {
-    DynamicProductList,
+    // DynamicProductList,
     ProductList,
     ProductListLoading,
 } from "./products/product-list";
@@ -16,9 +16,9 @@ function ProductListWrapper({
     productListStart?: number;
     globalContext?: SXLGlobalContext;
 }) {
-    if (globalContext?.dynamicProductList && DynamicProductList.Render) {
-        return <DynamicProductList.Render />;
-    }
+    // if (globalContext?.dynamicProductList && DynamicProductList.Render) {
+    //     return <DynamicProductList.Render />;
+    // }
 
     if (globalContext?.withLoadingState) {
         return (
