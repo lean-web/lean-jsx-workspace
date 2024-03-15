@@ -14,7 +14,9 @@
         "submodules": "git submodule update --init --recursive && npm install",
         "update-submodules": "git submodule update --remote",
         "versions": "node ./scripts/get_versions.js",
-        "bump-generator": "node ./scripts/bump_generator_versions.js"
+        "bump-generator": "node ./scripts/bump_generator_versions.js",
+        "publish:core": "npm publish -w \"packages/core\"",
+        "publish:types": "npm publish -w \"packages/lean-jsx-types\""
     },
     "devDependencies": {
         "@types/node": "^20.8.3",
