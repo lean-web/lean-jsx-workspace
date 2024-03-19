@@ -30,6 +30,8 @@
         "nx": "16.10.0",
         "nx-cloud": "latest",
         "prettier": "^3.0.3",
+        "semantic-release": "^23.0.5",
+        "semantic-release-monorepo": "^8.0.2",
         "ts-jest": "^29.1.1",
         "typescript": "^5.1.3",
         "yeoman-test": "^8.2.0"

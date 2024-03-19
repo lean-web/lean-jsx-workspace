@@ -1,5 +1,5 @@
 import { Layout } from "@/layout";
-import { APIComponent, withClientData } from "lean-jsx/server/components";
+import { APIC, withClientData } from "lean-jsx/server/components";
 
 async function getServerDate(): Promise<Date> {
     await Promise.resolve();
@@ -14,7 +14,7 @@ async function wait(timeInMillis: number): Promise<void> {
     });
 }
 
-const JSComponent = APIComponent(
+const JSComponent = APIC(
     {
         id: "dynamic-slow",
         requestHandler: async () => {
@@ -33,7 +33,7 @@ const JSComponent = APIComponent(
     },
 );
 
-export const ServerDateComponent = APIComponent(
+export const ServerDateComponent = APIC(
     {
         id: "my-server-date-component",
         requestHandler: async (req) => {
@@ -59,25 +59,19 @@ export function ReplacerComponent() {
     return (
         <>
             <button
-                onclick={withClientData({}, (ev, webContext) => {
-                    void webContext?.actions?.refetchElement(
-                        "my-server-date-component",
-                        {
-                            mmDDYY: true,
-                        },
-                    );
+                onclick={withClientData({}, (ev, actions) => {
+                    void actions.refetchAPIC("my-server-date-component", {
+                        mmDDYY: true,
+                    });
                 })}
             >
                 Get server date on mm/dd/yyyy format
             </button>
             <button
-                onclick={withClientData({}, (ev, webContext) => {
+                onclick={(ev, actions) => {
                     console.log("Replace");
-                    void webContext?.actions?.refetchElement(
-                        "my-server-date-component",
-                        {},
-                    );
-                })}
+                    void actions.refetchAPIC("my-server-date-component", {});
+                }}
             >
                 Get server date on ISO format
             </button>
@@ -126,17 +120,17 @@ export function MainActionsPage() {
                 name="bar2"
                 address={{ street: "18521 Derby", zip: "78660" }}
             ></header-menu>
-            <button
+            {/* <button
                 type="button"
                 id="btn"
-                onclick={withClientData({}, (ev, ctx) => {
-                    ctx?.actions.update<"header-menu">("dc1", {
+                onclick={(ev, actions) => {
+                    actions.update<"header-menu">("dc1", {
                         name: `${new Date().toISOString()}`,
                     });
-                })}
+                }}
             >
                 Click
-            </button>
+            </button> */}
         </Layout>
     );
 }

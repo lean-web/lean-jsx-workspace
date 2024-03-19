@@ -1,0 +1,16 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["lib"]
+        },
+        "semver": {
+            "dependsOn": ["^semver"]
+        },
+        "semver-check": {
+            "dependsOn": ["^semver-check"]
+        }
+    },
+    "globalDependencies": ["tsconfig.json"]
+}

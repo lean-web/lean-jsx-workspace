@@ -146,8 +146,8 @@ function createServer() {
             const user = { firstName: "John" };
             return (
                 <button
-                    onclick={withClientData(user, (ev, webContext) => {
-                        alert(`Hello ${webContext?.data.firstName}`);
+                    onclick={withClientData(user, (ev, actions, data) => {
+                        alert(`Hello ${data.firstName}`);
                     })}
                 >
                     Click to greet user

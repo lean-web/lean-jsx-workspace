@@ -85,7 +85,7 @@ All dynamic components can be updated using the [withClientData](/docs/architect
     onclick={withClientData({}, (ev, webContext) => {
         webContext?
           .actions?
-          .refetchElement("my-dynamic-component", {
+          .refetchAPIC("my-dynamic-component", {
             // pass query parameters
           });
     })}>
@@ -95,7 +95,7 @@ All dynamic components can be updated using the [withClientData](/docs/architect
 
 This helper creates all bindings necessary to update a dynamic component.
 
-The `refetchElement` receives two parameters:
+The `refetchAPIC` receives two parameters:
 
 - Component ID (`string`): The ID for the component to update
 - Query parameters (`Record<string, string>`): A map of query parameters for the updated component.
@@ -170,7 +170,7 @@ export function ReplacerComponent() {
         <>
             <button
                 onclick={withClientData({}, (ev, webContext) => {
-                    webContext?.actions?.refetchElement(
+                    webContext?.actions?.refetchAPIC(
                         "my-server-date-component",
                         {
                             mmDDYY: true,
@@ -183,7 +183,7 @@ export function ReplacerComponent() {
             <button
                 onclick={withClientData({}, (ev, webContext) => {
                     console.log("Replace");
-                    webContext?.actions?.refetchElement(
+                    webContext?.actions?.refetchAPIC(
                         "my-server-date-component",
                         {},
                     );

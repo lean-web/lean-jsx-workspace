@@ -1,4 +1,28 @@
-import { withClientContext } from "lean-web-utils/server";
+import { APICBuilder } from "lean-jsx/server/components";
+
+const SimpleAPIComponent = new APICBuilder("api-component", (req) => ({
+    method: req.method,
+    foo: req.query["foo"],
+    serverDate: new Date(),
+})).render(({ serverDate, foo, method }) => (
+    <div>
+        API Component! {serverDate}, ({foo}, method:{method})
+        <button
+            onclick={(ev, actions) => {
+                console.log(actions.getElementByAPICId("api-component"));
+                void actions.refetchAPIC(
+                    "api-component",
+                    {
+                        foo: "bar",
+                    },
+                    { referrer: "me", method: "post" },
+                );
+            }}
+        >
+            Refresh this
+        </button>
+    </div>
+));
 
 export function CheckAllProps() {
     return (
@@ -6,6 +30,12 @@ export function CheckAllProps() {
             <header className="app-header">
                 <h1>Welcome to the JSX Sanity Test</h1>
             </header>
+
+            <SimpleAPIComponent
+                serverDate={new Date()}
+                foo={"foo1"}
+                method="GET"
+            />
 
             <ACmp />
 
@@ -18,7 +48,7 @@ export function CheckAllProps() {
                 </button>
                 <form
                     method="GET"
-                    onsubmit={withClientContext((ev) => {
+                    onsubmit={(ev) => {
                         ev.preventDefault();
                         console.log({ ev });
                         if (ev.target) {
@@ -27,7 +57,7 @@ export function CheckAllProps() {
                             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                             alert(`Submitted: ${name}`);
                         }
-                    })}
+                    }}
                 >
                     <input
                         name="name"

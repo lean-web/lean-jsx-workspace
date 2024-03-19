@@ -9,3 +9,5 @@ packages/core/lib
 packages/create-lean-jsx-app
 packages/lean-jsx-docs
 **/lib
+jest.config.cjs
+.eslintrc.cjs

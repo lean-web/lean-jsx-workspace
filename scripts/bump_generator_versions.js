@@ -1,7 +1,11 @@
 const fs = require("fs");
 const glob = require("fast-glob");
 
-const GENERATOR_DEPENDENCIES = ["lean-jsx", "lean-jsx-types"];
+const GENERATOR_DEPENDENCIES = [
+    "lean-jsx",
+    "lean-jsx-types",
+    "eslint-plugin-lean-jsx",
+];
 const GENERATOR_VERSIONS_FILE = "packages/create-lean-jsx-app/versions.json";
 
 function main() {

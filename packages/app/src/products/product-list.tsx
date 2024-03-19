@@ -6,13 +6,13 @@ import {
     type Product,
 } from "../services/products";
 import {
-    APIComponent,
+    APIC,
     toQueryString,
     withClientData,
 } from "lean-jsx/server/components";
 
 function deleteProduct(id: string) {
-    return withClientData({ id }, async function (ev, ctx) {
+    return withClientData({ id }, async function (ev, actions, data) {
         const container = (ev?.currentTarget as HTMLElement | null | undefined)
             ?.parentElement;
 
@@ -22,11 +22,11 @@ function deleteProduct(id: string) {
         }
 
         container?.classList.add("product-loading");
-        await fetch(`/product/${ctx?.data.id}`, {
+        await fetch(`/product/${data.id}`, {
             method: "DELETE",
         });
 
-        await ctx?.actions.refetchElement("product-list", {});
+        await actions.refetchAPIC("product-list", {});
 
         container?.classList.remove("product-loading");
     });
@@ -45,20 +45,23 @@ export function ProductListDetails({
             </a>
 
             <button
-                onclick={withClientData({ index: product.id }, (ev, ctx) => {
-                    if (!ctx) {
-                        return;
-                    }
-                    const index = ctx.data.index;
-                    if (index) {
-                        void ctx.actions.replaceWith(
-                            `menu-product-${index}`,
-                            "product",
-                            { id: index },
-                            { onlyReplaceContent: false, noCache: true },
-                        );
-                    }
-                })}
+                onclick={withClientData(
+                    { index: product.id },
+                    (ev, actions, data) => {
+                        if (!data) {
+                            return;
+                        }
+                        const index = data.index;
+                        if (index) {
+                            void actions.replaceAPIC(
+                                `menu-product-${index}`,
+                                "product",
+                                { id: index },
+                                { onlyReplaceContent: false, noCache: true },
+                            );
+                        }
+                    },
+                )}
             >
                 Reload product
             </button>
@@ -67,7 +70,7 @@ export function ProductListDetails({
     );
 }
 
-APIComponent(
+APIC(
     {
         id: "product",
         requestHandler: (req) => ({
@@ -89,13 +92,10 @@ APIComponent(
                     <p>{new Date().toISOString()}</p>
                 </a>
                 <button
-                    onclick={withClientData({ index }, (ev, ctx) => {
-                        if (!ctx) {
-                            return;
-                        }
-                        const index = ctx.data.index;
+                    onclick={withClientData({ index }, (ev, actions, data) => {
+                        const index = data.index;
                         if (index) {
-                            void ctx.actions.replaceWith(
+                            void actions.replaceAPIC(
                                 `menu-product-${index}`,
                                 "product",
                                 { id: index },
@@ -141,12 +141,12 @@ export async function* ProductList_({
     );
 }
 
-export const ProductList = APIComponent<{ start: number }, SXL.AsyncGenElement>(
+export const ProductList = APIC<{ start: number }, SXL.AsyncGenElement>(
     { id: "product-list", requestHandler: (_req) => ({ start: 0 }) },
     ProductList_,
 );
 
-export const Something = APIComponent(
+export const Something = APIC(
     {
         id: "hello",
         requestHandler: function (

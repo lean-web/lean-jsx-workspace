@@ -68,7 +68,7 @@
 <script>
     
 
-    function refetchElement(id, queryParams) {
+    function refetchAPIC(id, queryParams) {
         const event = new CustomEvent("build", { detail: {id, queryParams} });
         document.dispatchEvent(event);
     }
@@ -130,9 +130,9 @@
     customElements.define("my-custom-element", MyCustomElement);
 
     document.querySelector("#click1").addEventListener("click", () => {
-        refetchElement('cmp1', {hide:true})
+        refetchAPIC('cmp1', {hide:true})
     });
     document.querySelector("#click2").addEventListener("click", () => {
-        refetchElement('cmp2', {hide:true})
+        refetchAPIC('cmp2', {hide:true})
     });
 </script>
